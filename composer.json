@@ -15,5 +15,5 @@
         },
         "files": ["src/index.php"]
     },
-    "minimum-stability":"@dev"
+    "minimum-stability":"stable"
 }
