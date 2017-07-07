@@ -14,5 +14,6 @@
             "ClientLibrary\\": "src"
         },
         "files": ["src/index.php"]
-    }
+    },
+    "minimum-stability":"dev"
 }
