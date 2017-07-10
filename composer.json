@@ -10,6 +10,7 @@
             "role": "Developer"
         }
     ],
+    "license":"Zoho Corp",
     "require": {
         "php": ">=5.6"
     },
