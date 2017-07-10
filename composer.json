@@ -3,6 +3,13 @@
     "description": "Client Library SDK for PHP",
     "type": "library",
     "homepage": "https://github.com/sumanthchilka/php-client-library",
+    "authors": [
+        {
+            "name": "Sumanth Reddy Chilka",
+            "homepage": "https://www.zoho.com/",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": ">=5.6"
     },
