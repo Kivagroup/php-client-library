@@ -170,24 +170,6 @@ class APIRequest
 		}
 	}
 	
-	/*public function downloadFile1()
-	{
-		try {
-			$connector=ZohoHTTPConnector::getInstance();
-			$connector->setUrl($this->url);
-			self::authenticateRequest();
-			$connector->setRequestHeadersMap($this->requestHeaders);
-			$connector->setRequestParamsMap($this->requestParams);
-			$connector->setRequestType($this->requestMethod);
-			$response=$connector->downloadFile();
-			return $response;
-		}catch (ZCRMException $e)
-		{
-			throw $e;
-		}
-	}
-	*/
-	
 	public function downloadFile()
 	{
 		try {
@@ -198,7 +180,6 @@ class APIRequest
 			$connector->setRequestParamsMap($this->requestParams);
 			$connector->setRequestType($this->requestMethod);
 			$response=$connector->downloadFile();
-			//return new FileAPIResponse($response[0],$response[1]['http_code']);
 			return (new FileAPIResponse())->setFileContent($response[0],$response[1]['http_code']);
 		}catch (ZCRMException $e)
 		{

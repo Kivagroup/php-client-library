@@ -437,9 +437,9 @@ class ZCRMModule
      * Method to update module settings.
      * @return response of the API
      */
-    public function updateModuleSettings($moduleInstance)
+    public function updateModuleSettings()
     {
-    	return ModuleAPIHandler::getInstance($this)->updateModuleSettings($moduleInstance);
+    	return ModuleAPIHandler::getInstance($this)->updateModuleSettings();
     }
     
     /**

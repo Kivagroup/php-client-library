@@ -195,10 +195,10 @@ class ModuleAPIHandler extends APIHandler
 	 * Input:: ZCRMModule instance with the properties to get updated
 	 * Returns api response
 	 **/
-	public function updateModuleSettings($moduleInstance)
+	public function updateModuleSettings()
 	{
 		try{
-			$inputJSON=self::constructJSONForModuleUpdate($moduleInstance);
+			$inputJSON=self::constructJSONForModuleUpdate($this->module);
 			$this->urlPath="settings/modules/".$this->module->getAPIName();
 			$this->requestMethod=APIConstants::REQUEST_METHOD_PUT;
 			$this->addHeader("Content-Type","application/json");
@@ -310,12 +310,12 @@ class ModuleAPIHandler extends APIHandler
 		$customViewInstance->setDefault((boolean)$customViewDetails['default']);
 		$customViewInstance->setName($customViewDetails['name']);
 		$customViewInstance->setSystemName($customViewDetails['system_name']);
-		$customViewInstance->setSortBy($customViewDetails['sort_by']);
-		$customViewInstance->setCategory($customViewDetails['category']);
-		$customViewInstance->setFields($customViewDetails['fields']);
-		$customViewInstance->setFavorite($customViewDetails['favorite']);
-		$customViewInstance->setSortOrder($customViewDetails['sort_order']);
-		if($customViewDetails['criteria']!=null)
+		$customViewInstance->setSortBy(isset($customViewDetails['sort_by'])?$customViewDetails['sort_by']:null);
+		$customViewInstance->setCategory(isset($customViewDetails['category'])?$customViewDetails['category']:null);
+		$customViewInstance->setFields(isset($customViewDetails['fields'])?$customViewDetails['fields']:null);
+		$customViewInstance->setFavorite(isset($customViewDetails['favorite'])?$customViewDetails['favorite']:null);
+		$customViewInstance->setSortOrder(isset($customViewDetails['sort_order'])?$customViewDetails['sort_order']:null);
+		if(isset($customViewDetails['criteria']) && $customViewDetails['criteria']!=null)
 		{
 			$criteriaList=$customViewDetails['criteria'];
 			$criteriaPattern="";

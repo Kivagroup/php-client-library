@@ -12,6 +12,10 @@ class Logger
 		}
 		$path=str_replace("\n", "", $path);
 		$filePointer=fopen($path."ZCRMClientLibrary.log","a");
+		if(!$filePointer)
+		{
+			return;
+		}
 		fwrite($filePointer,sprintf("%s %s\n",date("Y-m-d H:i:s"),$msg));
 		fclose($filePointer);
 	}
