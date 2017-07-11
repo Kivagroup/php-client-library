@@ -21,7 +21,7 @@ class Helper
 			$status='<font color="red">'.$status.'</font>';
 			Main::$failureCount++;
 		}
-		fwrite($filePointer, self::TRTDOPEN.$slNo.self::TDCLOSEOPEN.$className.self::TDCLOSEOPEN.$methodName.self::TDCLOSEOPEN.$message.self::TDCLOSEOPEN.$exception.self::TDCLOSEOPEN.$status.self::TDCLOSEOPEN.$timeTaken.self::TDTRCLOSE);
+		fwrite($filePointer, self::TRTDOPEN.$slNo.self::TDCLOSEOPEN.$className.self::TDCLOSEOPEN.$methodName.self::TDCLOSEOPEN.$message.self::TDCLOSEOPEN.$exception.self::TDCLOSEOPEN.$status.self::TDCLOSEOPEN.round($timeTaken).self::TDTRCLOSE);
 	}
 }
 ?>

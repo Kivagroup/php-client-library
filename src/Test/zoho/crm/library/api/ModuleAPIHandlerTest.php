@@ -7,6 +7,7 @@ class ModuleAPIHandlerTest
 	public static $moduleVsLayoutIdMap=array();
 	public static $moduleVsCustomViewIdMap=array();
 	public static $moduleVsRelatedListIdMap=array();
+	public static $customViewVsFieldMap=array();
 	
 	public static function test($fp)
 	{
@@ -20,6 +21,8 @@ class ModuleAPIHandlerTest
 		$ins->testGetCustomViewDetails();
 		$ins->testGetAllRelatedLists();
 		$ins->testGetRelatedListDetails();
+		$ins->testUpdateCustomView();
+		$ins->testUpdateModuleSettings();
 	}
 	
 	public function testGetAllFields()
@@ -282,6 +285,16 @@ class ModuleAPIHandlerTest
 						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getCustomViewDetails('.$customViewId.'),'.$moduleApiName,'Invalid Response','Invalid Custom view Data Received','failure',($endTime-$startTime));
 						continue;
 					}
+					if($zcrmCustomView->getFields()!=null && sizeof($zcrmCustomView->getFields())!=0)
+					{
+						if($moduleName=='Contacts')
+						{
+							self::$customViewVsFieldMap[$customViewId]=$zcrmCustomView->getFields()[1];
+						}
+						else {
+							self::$customViewVsFieldMap[$customViewId]=$zcrmCustomView->getFields()[0];
+						}
+					}
 	
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getCustomViewDetails('.$customViewId.'),'.$moduleApiName,null,null,'success',($endTime-$startTime));
 				}
@@ -372,6 +385,84 @@ class ModuleAPIHandlerTest
 					$endTime=$endTime==0?microtime(true)*1000:$endTime;
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getRelatedListDetails('.$relatedListId.'),'.$moduleApiName,$e->getMessage(),sizeof($e->getExceptionDetails())>0?$e->getExceptionDetails():$moduleApiName,'failure',($endTime-$startTime));
 				}
+			}
+		}
+	}
+	
+	public function testUpdateCustomView()
+	{
+		if(sizeof(self::$moduleVsCustomViewIdMap)<=0)
+		{
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','updateCustomView','Invalid Request','Module custom view List is empty','failure',0);
+			return;
+		}
+		foreach (self::$moduleVsCustomViewIdMap as $moduleApiName=>$customViewIdList)
+		{
+			$moduleIns=ZCRMModule::getInstance($moduleApiName);
+			$moduleName=MetaDataAPIHandlerTest::$moduleList[$moduleApiName];
+			if(TestUtil::isActivityModule($moduleName))
+			{
+				continue;
+			}
+			foreach ($customViewIdList as $customViewId)
+			{
+				$startTime=microtime(true)*1000;
+				$endTime=0;
+				try{
+					Main::incrementTotalCount();
+					$customViewIns=ZCRMCustomView::getInstance($moduleApiName,$customViewId);
+					$customViewIns->setSortBy(self::$customViewVsFieldMap[$customViewId]);
+					$customViewIns->setSortOrder("desc");
+					$responseInstance=$moduleIns->updateCustomView($customViewIns);
+					$endTime=microtime(true)*1000;
+					if($responseInstance->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $responseInstance->getMessage()!='CustomView Details updated successfully')
+					{
+						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleApiName.')','updateCustomView('.$customViewId.')','Invalid Response',$responseInstance->getHttpStatusCode().",".$responseInstance->getMessage(),'failure',($endTime-$startTime));
+					}
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleApiName.')','updateCustomView('.$customViewId.')','CustomView Details updated successfully',$customViewIns->getSortBy().",".$customViewIns->getSortOrder(),'success',($endTime-$startTime));
+				}
+				catch (ZCRMException $e)
+				{
+					$endTime=$endTime==0?microtime(true)*1000:$endTime;
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleApiName.')','updateCustomView('.$customViewId.')',$e->getMessage(),json_encode($e->getExceptionDetails()),'failure',($endTime-$startTime));
+				}
+			}
+		}
+				
+	}
+	
+	public function testUpdateModuleSettings()
+	{
+		if(sizeof(MetaDataAPIHandlerTest::$moduleList)<=0)
+		{
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','updateModuleSettings','Invalid Request','Module List is empty','failure',0);
+			return;
+		}
+		foreach (MetaDataAPIHandlerTest::$moduleList as $moduleApiName=>$moduleName)
+		{
+			if(in_array($moduleName, TestUtil::$nonSupportiveModules))
+			{
+				continue;
+			}
+			$startTime=microtime(true)*1000;
+			$endTime=0;
+			try{
+				Main::incrementTotalCount();
+				$moduleIns=ZCRMModule::getInstance($moduleApiName);
+				$moduleIns->setPerPage(40);
+				$responseInstance=$moduleIns->updateModuleSettings();
+				$endTime=microtime(true)*1000;
+				if($responseInstance->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $responseInstance->getResponseJSON()['modules']['message']!='module updated successfully')
+				{
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleApiName.')','updateModuleSettings(per_page=40)','Invalid Response',$responseInstance->getHttpStatusCode().",".json_encode($responseInstance->getResponseJSON()),'failure',($endTime-$startTime));
+					continue;
+				}
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleApiName.')','updateModuleSettings(per_page=40)','CustomView Details updated successfully',"'per_page':40",'success',($endTime-$startTime));
+			}
+			catch (ZCRMException $e)
+			{
+				$endTime=$endTime==0?microtime(true)*1000:$endTime;
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleApiName.')','updateCustomView('.$customViewId.')',$e->getMessage(),json_encode($e->getExceptionDetails()),'failure',($endTime-$startTime));
 			}
 		}
 	}

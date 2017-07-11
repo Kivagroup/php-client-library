@@ -26,7 +26,7 @@ class Main
 			$refreshToken=$oAuthTokens->getRefreshToken();
 			*/
 			$startTime=microtime(true)*1000;
-			$fileName="/Users/sumanth-3058/gitrepo/gitrepo_php1/automationReport.html";
+			$fileName="automationReport.html";
 			$fp=fopen($fileName, "w+");
 			$header="<html><head>Report</head><body><h1><center><b><i> PHP Client Library Test Report</i></b></center></h1><hr><br><table border=\"1\" width=\"100%\" cellspacing=\"2\" cellpadding=\"10\"><tr bgcolor=\"B7B2B2\"><td><b><center>SL no.</center></b></td><td><b><center>Class Name</center></b></td><td><b><center>Method Name</center></b></td><td><b><center>Message</center></b></td><td><b><center>Exception</center></b></td><td><b><center>Status</center></b></td><td><b><center>Time Taken(in milliseconds)</center></b></td></tr>";
 			fwrite($fp, $header);
