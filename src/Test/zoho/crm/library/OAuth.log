@@ -111,3 +111,8 @@
 2017-07-06 16:02:38 SEVERE: Deleting  oauthtokens failed: (0) 
 2017-07-06 17:03:11 INFO: Access Token has expired. Hence refreshing.
 2017-07-06 17:03:12 SEVERE: Deleting  oauthtokens failed: (0) 
+2017-07-10 14:39:11 INFO: Access Token has expired. Hence refreshing.
+2017-07-11 11:23:29 INFO: Access Token has expired. Hence refreshing.
+2017-07-11 11:23:29 SEVERE: Deleting  oauthtokens failed: (0) 
+2017-07-11 12:23:59 INFO: Access Token has expired. Hence refreshing.
+2017-07-11 12:24:00 SEVERE: Deleting  oauthtokens failed: (0) 
