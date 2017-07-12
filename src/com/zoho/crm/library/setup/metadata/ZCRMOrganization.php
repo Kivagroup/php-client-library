@@ -93,9 +93,9 @@ class ZCRMOrganization
 		return UserAPIHandler::getInstance()->getRole($roleId);
 	}
 	
-	public function createUsers($userInstanceArray)
+	public function createUser($userInstance)
 	{
-		return UserAPIHandler::getInstance()->createUsers($userInstanceArray);
+		return UserAPIHandler::getInstance()->createUser($userInstance);
 	}
 }
 ?>

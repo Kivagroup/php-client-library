@@ -73,10 +73,10 @@ class UserAPIHandler extends APIHandler
 		return $crmRoleInstance;
 	}
 	
-	public function createUsers($userInstanceArray)
+	public function createUser($userInstance)
 	{
 		try{
-			$userJson=self::constructJSONForUser($userInstanceArray);
+			$userJson=self::constructJSONForUser(array($userInstance));
 			$this->urlPath="users";
 			$this->requestMethod=APIConstants::REQUEST_METHOD_POST;
 			$this->addHeader("Content-Type","application/json");

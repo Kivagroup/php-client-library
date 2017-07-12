@@ -69,6 +69,10 @@ class APIResponse extends CommonAPIResponse
     	{
     		$responseJSON=$responseJSON['data'][0];
     	}
+    	else if(array_key_exists("users",$responseJSON))
+    	{
+    		$responseJSON=$responseJSON['users'][0];
+    	}
     	if(isset($responseJSON['status']) && $responseJSON['status']==APIConstants::CODE_ERROR)
     	{
     		$exception=new ZCRMException($responseJSON['message'],self::getHttpStatusCode());
