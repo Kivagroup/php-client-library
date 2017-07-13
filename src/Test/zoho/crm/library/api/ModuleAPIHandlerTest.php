@@ -271,7 +271,7 @@ class ModuleAPIHandlerTest
 				$endTime=0;
 				try{
 					Main::incrementTotalCount();
-					$responseInstance=$moduleIns->getCustomViewDetails($customViewId);
+					$responseInstance=$moduleIns->getCustomView($customViewId);
 					$zcrmCustomView=$responseInstance->getData();
 					$endTime=microtime(true)*1000;
 	

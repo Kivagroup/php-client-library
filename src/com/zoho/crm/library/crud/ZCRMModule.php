@@ -430,7 +430,7 @@ class ZCRMModule
      */
     public function getCustomViewDetails($customViewId)
     {
-    	return ModuleAPIHandler::getInstance($this)->getCustomViewDetails($customViewId);
+    	return ModuleAPIHandler::getInstance($this)->getCustomView($customViewId);
     }
     
     /**

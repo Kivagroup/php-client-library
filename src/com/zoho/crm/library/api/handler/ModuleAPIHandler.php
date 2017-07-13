@@ -141,7 +141,7 @@ class ModuleAPIHandler extends APIHandler
 	 * Input:: custom view id
 	 * Returns api response with ZCRMCustomView instance
 	 **/
-	public function getCustomViewDetails($customViewId)
+	public function getCustomView($customViewId)
 	{
 		try{
 			$this->urlPath="settings/custom_views/".$customViewId;
