@@ -13,12 +13,6 @@ class ZCRMConfigUtil
 	public static function initialize($initializeOAuth)
 	{
 		$path=realpath(dirname(__FILE__)."/../../../../../resources/configuration.properties");
-		//$path="/Users/sumanth-3058/Documents/workspace/php1/Test1/src/client_library.phar/resources/configuration.properties";
-		/*echo ROOT_PATH;
-		$path=ROOT_PATH."/resources/configuration.properties";
-		echo "\n\npath=".$path.";";
-		//$path='/src/resources/configuration.properties';
-		*/
 		$fileHandler=fopen($path,"r");
 		if(!$fileHandler)
 		{

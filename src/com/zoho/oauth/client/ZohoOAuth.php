@@ -38,7 +38,6 @@ class ZohoOAuth
 			$oAuthParams->setClientId(self::getConfigValue(ZohoOAuthConstants::CLIENT_ID));
 			$oAuthParams->setClientSecret(self::getConfigValue(ZohoOAuthConstants::CLIENT_SECRET));
 			$oAuthParams->setRedirectURL(self::getConfigValue(ZohoOAuthConstants::REDIRECT_URL));
-			$oAuthParams->setScopes(self::getConfigValue(ZohoOAuthConstants::SCOPES));
 			ZohoOAuthClient::getInstance($oAuthParams);
 		}
 		catch (IOException $ioe)

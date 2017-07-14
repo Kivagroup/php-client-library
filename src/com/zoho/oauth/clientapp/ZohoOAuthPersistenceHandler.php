@@ -8,25 +8,28 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 	public function saveOAuthData($zohoOAuthTokens)
 	{
 		$db_link=null;
-		$stmt=null;
 		try{
 			self::deleteOAuthTokens($zohoOAuthTokens->getUserEmailId());
 			$db_link=self::getMysqlConnection();
-			$query="INSERT INTO oauthtokens(useridentifier,accesstoken,refreshtoken,expirytime) VALUES(?,?,?,?)";
+			$query="INSERT INTO oauthtokens(useridentifier,accesstoken,refreshtoken,expirytime) VALUES('".$zohoOAuthTokens->getUserEmailId()."','".$zohoOAuthTokens->getAccessToken()."','".$zohoOAuthTokens->getRefreshToken()."',".$zohoOAuthTokens->getExpiryTime().")";
+			
+			/*$query="INSERT INTO oauthtokens(useridentifier,accesstoken,refreshtoken,expirytime) VALUES(?,?,?,?)";
 			$stmt=$db_link->prepare($query);
 			//ssi represents data types of param values (String,String,Integer)
 			$stmt->bind_param("sssi",$zohoOAuthTokens->getUserEmailId(),$zohoOAuthTokens->getAccessToken(),$zohoOAuthTokens->getRefreshToken(),$zohoOAuthTokens->getExpiryTime());
-			$stmt->execute();
+			$stmt->execute();*/
+			$result=mysqli_query($db_link, $query);
+			if(!$result)
+			{
+				OAuthLogger::severe("OAuth token insertion failed: (" . $db_link->errno . ") " . $db_link->error);
+			}
+			
 		}
 		catch (Exception $ex)
 		{
 			Logger:severe("Exception occured while inserting OAuthTokens into DB(file::ZohoOAuthPersistenceHandler)({$ex->getMessage()})\n{$ex}");
 		}
 		finally {
-			if($stmt!=null)
-			{
-				$stmt->close();
-			}
 			if($db_link!=null)
 			{
 				$db_link->close();
@@ -37,16 +40,13 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 	public function getOAuthTokens($userEmailId)
 	{
 		$db_link=null;
-		$stmt=null;
 		$oAuthTokens=new ZohoOAuthTokens();
 		try{
 			$db_link=self::getMysqlConnection();
-			$query="SELECT * FROM oauthtokens where useridentifier=".$userEmailId;
-			$stmt=$db_link->prepare($query);
-			$stmt->execute();
-			$resultSet = $stmt->get_result();
+			$query="SELECT * FROM oauthtokens where useridentifier='".$userEmailId."'";
+			$resultSet=mysqli_query($db_link,$query);
 			if (!$resultSet) {
-				OAuthLogger::severe("Getting result set failed: (" . $stmt->errno . ") " . $stmt->error);
+				OAuthLogger::severe("Getting result set failed: (" . $db_link->errno . ") " . $db_link->error);
 			}else{
 				while($row=mysqli_fetch_row($resultSet))
 				{
@@ -54,6 +54,7 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 					$oAuthTokens->setRefreshToken($row[2]);
 					$oAuthTokens->setAccessToken($row[1]);
 					$oAuthTokens->setUserEmailId($row[0]);
+					break;
 				}
 			}
 		}
@@ -62,10 +63,6 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 			OAuthLogger::severe("Exception occured while getting OAuthTokens from DB(file::ZohoOAuthPersistenceHandler)({$ex->getMessage()})\n{$ex}");
 		}
 		finally {
-			if($stmt!=null)
-			{
-				$stmt->close();
-			}
 			if($db_link!=null)
 			{
 				$db_link->close();
@@ -77,13 +74,12 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 	public function deleteOAuthTokens($userEmailId)
 	{
 		$db_link=null;
-		$stmt=null;
 		try{
 			$db_link=self::getMysqlConnection();
-			$query="DELETE FROM oauthtokens where useridentifier=".$userEmailId;
-			$result=$db_link->query($query);
-			if(!$result) {
-				OAuthLogger::severe("Deleting  oauthtokens failed: (" . $stmt->errno . ") " . $stmt->error);
+			$query="DELETE FROM oauthtokens where useridentifier='".$userEmailId."'";
+			$resultSet=mysqli_query($db_link,$query);
+			if(!$resultSet) {
+				OAuthLogger::severe("Deleting  oauthtokens failed: (" . $db_link->errno . ") " . $db_link->error);
 			}
 		}
 		catch (Exception $ex)
@@ -91,10 +87,6 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 			OAuthLogger::severe("Exception occured while Deleting OAuthTokens from DB(file::ZohoOAuthPersistenceHandler)({$ex->getMessage()})\n{$ex}");
 		}
 		finally {
-			if($stmt!=null)
-			{
-				$stmt->close();
-			}
 			if($db_link!=null)
 			{
 				$db_link->close();
