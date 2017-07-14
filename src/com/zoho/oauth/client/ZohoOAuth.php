@@ -88,11 +88,6 @@ class ZohoOAuth
 		return self::getIAMUrl()."/oauth/user/info";
 	}
 	
-	public static function getCRMScope()
-	{
-		return self::getConfigValue(ZohoOAuthConstants::SCOPES);
-	}
-	
 	public static function getClientID()
 	{
 		return self::getConfigValue(ZohoOAuthConstants::CLIENT_ID);
@@ -117,8 +112,7 @@ class ZohoOAuth
 	{
 		try
 		{
-			$className = self::getConfigValue(ZohoOAuthConstants::PERSISTENCE_HANDLER_CLASS);
-			return new $className;
+			return new ZohoOAuthPersistenceHandler();
 		}
 		catch (Exception $ex)
 		{

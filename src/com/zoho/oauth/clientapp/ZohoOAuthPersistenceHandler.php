@@ -81,10 +81,8 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 		try{
 			$db_link=self::getMysqlConnection();
 			$query="DELETE FROM oauthtokens where useridentifier=".$userEmailId;
-			$stmt=$db_link->prepare($query);
-			$stmt->execute();
-			$resultSet = $stmt->get_result();
-			if (!$resultSet) {
+			$result=$db_link->query($query);
+			if(!$result) {
 				OAuthLogger::severe("Deleting  oauthtokens failed: (" . $stmt->errno . ") " . $stmt->error);
 			}
 		}

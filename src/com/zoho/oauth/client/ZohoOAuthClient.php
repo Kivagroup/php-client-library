@@ -54,15 +54,6 @@ class ZohoOAuthClient
 		}
 	}
 	
-	public function requestGrantToken()
-	{
-		$conn = getZohoConnector(ZohoOAuth::getGrantURL());
-		$conn->addParam(ZohoOAuthConstants::SCOPES, ZohoOAuth::getCRMScope());
-		$conn->addParam(ZohoOAuthConstants::RESPONSE_TYPE, ZohoOAuthConstants::RESPONSE_TYPE_CODE);
-		$conn->addParam(ZohoOAuthConstants::ACCESS_TYPE, ZohoOAuth::getAccessType());
-		return $conn.get();
-	}
-	
 	public function generateAccessToken($grantToken)
 	{
 		if($grantToken == null)
@@ -75,7 +66,7 @@ class ZohoOAuthClient
 			$conn->addParam(ZohoOAuthConstants::GRANT_TYPE, ZohoOAuthConstants::GRANT_TYPE_AUTH_CODE);
 			$conn->addParam(ZohoOAuthConstants::CODE, $grantToken);
 			$resp = $conn->post();
-			$responseJSON=json_decode($resp,true);
+			$responseJSON=self::processResponse($resp);
 			if(array_key_exists(ZohoOAuthConstants::ACCESS_TOKEN,$responseJSON))
 			{
 				$tokens = self::getTokensFromJSON($responseJSON);
@@ -88,7 +79,7 @@ class ZohoOAuthClient
 				throw new ZohoOAuthException("Exception while fetching access token from grant token - " .$resp);
 			}
 		}
-		catch (Exception $ex)
+		catch (ZohoOAuthException $ex)
 		{
 			throw new ZohoOAuthException($ex);
 		}
@@ -106,7 +97,7 @@ class ZohoOAuthClient
 			$conn->addParam(ZohoOAuthConstants::GRANT_TYPE, ZohoOAuthConstants::GRANT_TYPE_REFRESH);
 			$conn->addParam(ZohoOAuthConstants::REFRESH_TOKEN, $refreshToken);
 			$response = $conn->post();
-			$responseJSON = json_decode($response,true);
+			$responseJSON=self::processResponse($response);
 			if (array_key_exists(ZohoOAuthConstants::ACCESS_TOKEN,$responseJSON))
 			{
 				$tokens = self::getTokensFromJSON($responseJSON);
@@ -120,7 +111,7 @@ class ZohoOAuthClient
 				throw new ZohoOAuthException("Exception while fetching access token from refresh token - " . $response);
 			}
 		}
-		catch (Exception $ex)
+		catch (ZohoOAuthException $ex)
 		{
 			throw new ZohoOAuthException($ex);
 		}
@@ -176,16 +167,16 @@ class ZohoOAuthClient
     	$connector->setUrl(ZohoOAuth::getUserInfoURL());
     	$connector->addHeadder(ZohoOAuthConstants::AUTHORIZATION, ZohoOAuthConstants::OAUTH_HEADER_PREFIX.$accessToken);
     	$apiResponse=$connector->get();
-    	$response=$apiResponse[0];
-    	$responseInfo=$apiResponse[1];
-    	if($responseInfo['http_code']!=ZohoOAuthConstants::RESPONSECODE_OK)
-    	{
-    		throw new ZohoOAuthException("Invalid response received from Accounts server:".$responseInfo['http_code']);
-    	}
-    	list($headers, $content) = explode("\r\n\r\n",$response,2);
-    	$jsonResponse=json_decode($content,true);
+    	$jsonResponse=self::processResponse($apiResponse);
     	
     	return $jsonResponse['Email'];
+    }
+    public function processResponse($apiResponse)
+    {
+    	list($headers, $content) = explode("\r\n\r\n",$apiResponse,2);
+    	$jsonResponse=json_decode($content,true);
+    	
+    	return $jsonResponse;
     }
     
 }

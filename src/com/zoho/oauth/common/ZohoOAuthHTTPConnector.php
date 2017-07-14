@@ -19,10 +19,9 @@ class ZohoOAuthHTTPConnector
 		curl_setopt($curl_pointer,CURLOPT_POST,$this->requestParamCount);
 		curl_setopt($curl_pointer,CURLOPT_CUSTOMREQUEST,ZohoOAuthConstants::REQUEST_METHOD_POST);
 		$result=curl_exec($curl_pointer);
-		$responseInfo=curl_getinfo($curl_pointer);
 		curl_close($curl_pointer);
 		
-		return array($result,$responseInfo);
+		return $result;
 	}
 	
 	public function get()
@@ -36,10 +35,9 @@ class ZohoOAuthHTTPConnector
 		curl_setopt($curl_pointer,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
 		curl_setopt($curl_pointer,CURLOPT_CUSTOMREQUEST,ZohoOAuthConstants::REQUEST_METHOD_GET);
 		$result=curl_exec($curl_pointer);
-		$responseInfo=curl_getinfo($curl_pointer);
 		curl_close($curl_pointer);
 		
-		return array($result,$responseInfo);
+		return $result;
 	}
 	
 	
