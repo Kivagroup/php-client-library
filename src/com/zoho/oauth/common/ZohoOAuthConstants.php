@@ -29,33 +29,12 @@ class ZohoOAuthConstants
 	const TOKEN = "token";
 	const DISPATCH_TO = "dispatchTo";
 	const OAUTH_TOKENS_PARAM = "oauth_tokens";
-	/*public static $iam_url="iamURL";
-	public static $scopes="scope";
-	public static $state="state";
-	public static $state_obtaining_grant_token="OBTAIN_GRANT_TOKEN";
-	public static $response_type="response_type";
-	public static $response_type_code="code";
-	public static $client_id="client_id";
-	public static $client_secret="client_secret";
-	public static $redirect_url="redirect_uri";
-	public static $access_type="access_type";
-	public static $access_type_offline="offline";
-	public static $access_type_online="online";
-	public static $prompt="prompt";
-	public static $prompt_consent="consent";
-	public static $grant_type="grant_type";
-	public static $grant_type_auth_code="authorization_code";
 	
-	public static $grant_type_refresh="refresh_token";
-	public static $code="code";
-	public static $grant_token="grant_token";
-	public static $access_token="access_token";
-	public static $refresh_token="refresh_token";
-	public static $expires_in = "expires_in";
-	public static $expiriy_time = "expiry_time";
-	public static $persistence_handler_class = "persistence_handler_class";
-	public static $token = "token";
-	public static $dispatch_to = "dispatchTo";
-	public static $oauth_tokens_param = "oauth_tokens";*/
+	const OAUTH_HEADER_PREFIX="Zoho-oauthtoken ";
+	const AUTHORIZATION="Authorization";
+	const REQUEST_METHOD_GET="GET";
+	const REQUEST_METHOD_POST="POST";
+	
+	const RESPONSECODE_OK=200;
 }
 ?>

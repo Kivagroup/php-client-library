@@ -87,66 +87,6 @@ class APIResponse extends CommonAPIResponse
     		self::setMessage($responseJSON['message']);
     		self::setDetails($responseJSON['details']);
     	}
-    	
-    	/*if($statusCode!=APIConstants::RESPONSECODE_OK)
-    	{
-    		$content_after_decode=json_decode($content,true);
-    		if(self::getApiKey()!=null && array_key_exists(self::getApiKey(),$content_after_decode))
-    		{
-    			$response=$content_after_decode[self::getApiKey()];
-    		}else
-    		{
-    			$response=$content_after_decode;
-    		}
-    		$apiResponse->setCode($response['code']);
-    		$apiResponse->setStatus($response['status']);
-    		$apiResponse->setMessage($response['message']);
-    		$apiResponse->setDetails($response['details']);
-    	}*/
-    	
-    	
-    	/*if($responseInfo['http_code']==APIConstants::RESPONSECODE_OK && array_key_exists("data",$jsonResponse))
-    	{
-    		$responseData=$jsonResponse['data'][0];
-    		if($responseData['status']==APIConstants::CODE_ERROR)
-    		{
-    			$exception=new ZCRMException($responseData['message']);
-    			$exception->setExceptionCode($responseData['code']);
-    			throw $exception;
-    		}
-    		$apiResponse->setCode($responseData['code']);
-    		 $apiResponse->setStatus($responseData['status']);
-    		 $apiResponse->setMessage($responseData['message']);
-    		 $apiResponse->setDetails($responseData['details']);
-    	}*/
-    	
-    	/*$messageJSON=self::getResponseJSON();
-    	if($messageJSON!=null && array_key_exists("data",$messageJSON))
-    	{
-    		$messageJSON=$messageJSON['data'][0];
-    	}
-    	if(array_key_exists("status",$messageJSON) && $messageJSON['status']==APIConstants::CODE_ERROR)
-    	{
-    		$exception=new ZCRMException($messageJSON['message']);
-    		$exception->setExceptionCode($messageJSON['code']);
-    		throw $exception;
-    	}
-    	if($statusCode==APIConstants::RESPONSECODE_OK || $statusCode==APIConstants::RESPONSECODE_ACCEPTED)
-    	{
-    		return;
-    	}
-    	else if($statusCode==APIConstants::RESPONSECODE_NO_CONTENT)
-    	{
-    		$exception=new ZCRMException(APIConstants::INVALID_ID_MSG);
-    		$exception->setExceptionCode("No Content");
-    		throw $exception;
-    	}
-    	else
-    	{
-    		$exception=new ZCRMException(self::getMessage());
-    		$exception->setExceptionCode(self::getCode());
-    		throw $exception;
-    	}*/
     }
 
 }

@@ -6,6 +6,7 @@ class ZohoOAuthTokens
 	private $refreshToken;
 	private $accessToken;
 	private $expiryTime;
+	private $userEmailId;
 	
 	public function getRefreshToken()
 	{
@@ -47,5 +48,22 @@ class ZohoOAuthTokens
 	{
 		return round(microtime(true)*1000);
 	}
+
+    /**
+     * userEmailId
+     * @return String
+     */
+    public function getUserEmailId(){
+        return $this->userEmailId;
+    }
+
+    /**
+     * userEmailId
+     * @param String $userEmailId
+     */
+    public function setUserEmailId($userEmailId){
+        $this->userEmailId = $userEmailId;
+    }
+
 }
 ?>

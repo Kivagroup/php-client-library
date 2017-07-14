@@ -49,5 +49,10 @@ class ZCRMRestClient
 	{
 		return UserAPIHandler::getInstance()->getCurrentUser();
 	}
+	
+	public static function getCurrentUserEmailID()
+	{
+		return isset($_SERVER[APIConstants::USER_EMAIL_ID])?$_SERVER[APIConstants::USER_EMAIL_ID]:null;
+	}
 }
 ?>

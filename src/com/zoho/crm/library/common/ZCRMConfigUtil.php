@@ -62,8 +62,18 @@ class ZCRMConfigUtil
 	}
 	public static function getAccessToken()
 	{
+		$currentUserEmail= ZCRMRestClient::getCurrentUserEmailID();
+		
+		if ($currentUserEmail == null && self::getConfigValue("currentUserEmail") == null)
+		{
+			throw new ZCRMException("Current user should either be set in ZCRMRestClient or in configuration.properties file");
+		}
+		else if ($currentUserEmail == null)
+		{
+			$currentUserEmail = self::getConfigValue("currentUserEmail");
+		}
 		$oAuthCliIns = ZohoOAuth::getClientInstance();
-		return $oAuthCliIns->getAccessToken();
+		return $oAuthCliIns->getAccessToken($currentUserEmail);
 	}
 	/**
 	 * Returns the authentication class name.

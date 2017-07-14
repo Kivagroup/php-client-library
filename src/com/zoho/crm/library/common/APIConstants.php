@@ -60,5 +60,7 @@ class APIConstants
 	const RESPONSECODE_INTERNAL_SERVER_ERROR=500;
 	
 	const DOWNLOAD_FILE_PATH="../../../../../../resources";
+	
+	const USER_EMAIL_ID="user_email_id";
 }
 ?>

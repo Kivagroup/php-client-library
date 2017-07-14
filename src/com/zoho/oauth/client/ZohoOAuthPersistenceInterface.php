@@ -2,7 +2,7 @@
 interface ZohoOAuthPersistenceInterface
 {
 	public function saveOAuthData($zohoOAuthTokens);
-	public function getOAuthTokens();
-	public function deleteOAuthTokens();
+	public function getOAuthTokens($userEmailId);
+	public function deleteOAuthTokens($userEmailId);
 }
 ?>

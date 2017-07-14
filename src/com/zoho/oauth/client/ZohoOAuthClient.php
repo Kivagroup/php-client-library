@@ -29,13 +29,13 @@ class ZohoOAuthClient
 		return self::$zohoOAuthClient;
 	}
 	
-	public function getAccessToken()
+	public function getAccessToken($userEmailId)
 	{
 		$persistence = ZohoOAuth::getPersistenceHandlerInstance();
 		$tokens;
 		try
 		{
-			$tokens = $persistence->getOAuthTokens();
+			$tokens = $persistence->getOAuthTokens($userEmailId);
 		}
 		catch(Exception $ex)
 		{
@@ -49,7 +49,7 @@ class ZohoOAuthClient
 		catch(ZohoOAuthException $ex)
 		{
 			OAuthLogger::info("Access Token has expired. Hence refreshing.");
-			$tokens = self::refreshAccessToken($tokens->getRefreshToken());
+			$tokens = self::refreshAccessToken($tokens->getRefreshToken(),$userEmailId);
 			return $tokens->getAccessToken();
 		}
 	}
@@ -79,6 +79,7 @@ class ZohoOAuthClient
 			if(array_key_exists(ZohoOAuthConstants::ACCESS_TOKEN,$responseJSON))
 			{
 				$tokens = self::getTokensFromJSON($responseJSON);
+				$tokens->setUserEmailId(self::getUserEmailIdFromIAM($tokens->getAccessToken()));
 				ZohoOAuth::getPersistenceHandlerInstance()->saveOAuthData($tokens);
 				return $tokens;
 			}
@@ -93,7 +94,7 @@ class ZohoOAuthClient
 		}
 	}
 	
-	private function refreshAccessToken($refreshToken)
+	private function refreshAccessToken($refreshToken,$userEmailId)
 	{
 		if($refreshToken == null)
 		{
@@ -110,6 +111,7 @@ class ZohoOAuthClient
 			{
 				$tokens = self::getTokensFromJSON($responseJSON);
 				$tokens->setRefreshToken($refreshToken);
+				$tokens->setUserEmailId($userEmailId);
 				ZohoOAuth::getPersistenceHandlerInstance()->saveOAuthData($tokens);
 				return $tokens;
 			}
@@ -167,6 +169,24 @@ class ZohoOAuthClient
     public function setZohoOAuthParams($zohoOAuthParams){
         $this->zohoOAuthParams = $zohoOAuthParams;
     }
-
+    
+    public function getUserEmailIdFromIAM($accessToken)
+    {
+    	$connector = new ZohoOAuthHTTPConnector();
+    	$connector->setUrl(ZohoOAuth::getUserInfoURL());
+    	$connector->addHeadder(ZohoOAuthConstants::AUTHORIZATION, ZohoOAuthConstants::OAUTH_HEADER_PREFIX.$accessToken);
+    	$apiResponse=$connector->get();
+    	$response=$apiResponse[0];
+    	$responseInfo=$apiResponse[1];
+    	if($responseInfo['http_code']!=ZohoOAuthConstants::RESPONSECODE_OK)
+    	{
+    		throw new ZohoOAuthException("Invalid response received from Accounts server:".$responseInfo['http_code']);
+    	}
+    	list($headers, $content) = explode("\r\n\r\n",$response,2);
+    	$jsonResponse=json_decode($content,true);
+    	
+    	return $jsonResponse['Email'];
+    }
+    
 }
 ?>

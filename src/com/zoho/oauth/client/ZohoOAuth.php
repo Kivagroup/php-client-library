@@ -83,6 +83,11 @@ class ZohoOAuth
 		return self::getIAMUrl()."/oauth/v2/token/revoke";
 	}
 	
+	public static function getUserInfoURL()
+	{
+		return self::getIAMUrl()."/oauth/user/info";
+	}
+	
 	public static function getCRMScope()
 	{
 		return self::getConfigValue(ZohoOAuthConstants::SCOPES);

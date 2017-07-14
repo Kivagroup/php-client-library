@@ -10,12 +10,12 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 		$db_link=null;
 		$stmt=null;
 		try{
-			self::deleteOAuthTokens();
+			self::deleteOAuthTokens($zohoOAuthTokens->getUserEmailId());
 			$db_link=self::getMysqlConnection();
-			$query="INSERT INTO oauthtokens(accesstoken,refreshtoken,expirytime) VALUES(?,?,?)";
+			$query="INSERT INTO oauthtokens(useridentifier,accesstoken,refreshtoken,expirytime) VALUES(?,?,?,?)";
 			$stmt=$db_link->prepare($query);
 			//ssi represents data types of param values (String,String,Integer)
-			$stmt->bind_param("ssi",$zohoOAuthTokens->getAccessToken(),$zohoOAuthTokens->getRefreshToken(),$zohoOAuthTokens->getExpiryTime());
+			$stmt->bind_param("sssi",$zohoOAuthTokens->getUserEmailId(),$zohoOAuthTokens->getAccessToken(),$zohoOAuthTokens->getRefreshToken(),$zohoOAuthTokens->getExpiryTime());
 			$stmt->execute();
 		}
 		catch (Exception $ex)
@@ -34,14 +34,14 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 		}
 	}
 	
-	public function getOAuthTokens()
+	public function getOAuthTokens($userEmailId)
 	{
 		$db_link=null;
 		$stmt=null;
 		$oAuthTokens=new ZohoOAuthTokens();
 		try{
 			$db_link=self::getMysqlConnection();
-			$query="SELECT * FROM oauthtokens";
+			$query="SELECT * FROM oauthtokens where useridentifier=".$userEmailId;
 			$stmt=$db_link->prepare($query);
 			$stmt->execute();
 			$resultSet = $stmt->get_result();
@@ -50,9 +50,10 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 			}else{
 				while($row=mysqli_fetch_row($resultSet))
 				{
-					$oAuthTokens->setExpiryTime($row[2]);
-					$oAuthTokens->setRefreshToken($row[1]);
-					$oAuthTokens->setAccessToken($row[0]);
+					$oAuthTokens->setExpiryTime($row[3]);
+					$oAuthTokens->setRefreshToken($row[2]);
+					$oAuthTokens->setAccessToken($row[1]);
+					$oAuthTokens->setUserEmailId($row[0]);
 				}
 			}
 		}
@@ -73,13 +74,13 @@ class ZohoOAuthPersistenceHandler implements ZohoOAuthPersistenceInterface
 		return $oAuthTokens;
 	}
 	
-	public function deleteOAuthTokens()
+	public function deleteOAuthTokens($userEmailId)
 	{
 		$db_link=null;
 		$stmt=null;
 		try{
 			$db_link=self::getMysqlConnection();
-			$query="DELETE FROM oauthtokens";
+			$query="DELETE FROM oauthtokens where useridentifier=".$userEmailId;
 			$stmt=$db_link->prepare($query);
 			$stmt->execute();
 			$resultSet = $stmt->get_result();
