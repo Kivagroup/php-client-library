@@ -54,9 +54,7 @@ class APIRequest
 	private function authenticateRequest()
 	{
 		try{
-			$className=ZCRMConfigUtil::getAuthenticationClass();
-			$className=$className==''?'ZCRMConfigUtil':$className;
-			$accessToken= (new $className())->getAccessToken();
+			$accessToken= (new ZCRMConfigUtil())->getAccessToken();
 			$this->requestHeaders[APIConstants::AUTHORIZATION]=APIConstants::OAUTH_HEADER_PREFIX.$accessToken;
 		}catch (ZCRMException $ex)
 		{

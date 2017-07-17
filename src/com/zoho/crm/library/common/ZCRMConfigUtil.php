@@ -69,22 +69,6 @@ class ZCRMConfigUtil
 		$oAuthCliIns = ZohoOAuth::getClientInstance();
 		return $oAuthCliIns->getAccessToken($currentUserEmail);
 	}
-	/**
-	 * Returns the authentication class name.
-	 * @return authentication class name
-	 */
-	public static function getAuthenticationClass()
-	{
-		return self::getConfigValue("loginAuthClass");
-	}
-	/**
-	 * Returns the authentication class namespace.
-	 * @return authentication class namespace
-	 */
-	public static function getAuthenticationClassNameSpace()
-	{
-		return self::getConfigValue("loginAuthClassNameSpace");
-	}
 	
 	public static function getAllConfigs()
 	{
