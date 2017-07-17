@@ -1,5 +1,6 @@
 <?php
 require_once realpath(dirname(__FILE__).'/../../crud/ZCRMRecord.php');
+require_once realpath(dirname(__FILE__).'/../../crud/ZCRMTrashRecord.php');
 require_once 'EntityAPIHandler.php';
 require_once 'APIHandler.php';
 

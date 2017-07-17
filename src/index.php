@@ -32,6 +32,8 @@ require_once 'com/zoho/crm/library/crud/ZCRMRecord.php';
 require_once 'com/zoho/crm/library/crud/ZCRMRelatedListProperties.php';
 require_once 'com/zoho/crm/library/crud/ZCRMSection.php';
 require_once 'com/zoho/crm/library/crud/ZCRMTax.php';
+require_once 'com/zoho/crm/library/crud/ZCRMJunctionRecord.php';
+require_once 'com/zoho/crm/library/crud/ZCRMTrashRecord.php';
 
 require_once 'com/zoho/crm/library/exception/ZCRMException.php';
 
