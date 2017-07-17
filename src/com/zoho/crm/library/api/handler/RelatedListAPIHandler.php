@@ -273,6 +273,10 @@ class RelatedListAPIHandler extends APIHandler
 			$this->urlPath=$this->parentRecord->getModuleApiName()."/".$this->parentRecord->getEntityId()."/".$this->junctionRecord->getApiName()."/".$this->junctionRecord->getId();
 			
 			$dataArray=$this->junctionRecord->getRelatedDetails();
+			if(sizeof($dataArray)==0)
+			{
+				$dataArray=CommonUtil::getEmptyJSONObject();
+			}
 			$inputJSON=array("data"=>array($dataArray));
 			$this->requestBody=json_encode($inputJSON);
 			return APIRequest::getInstance($this)->getAPIResponse();

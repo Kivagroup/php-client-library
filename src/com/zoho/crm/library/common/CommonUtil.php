@@ -23,5 +23,10 @@ class CommonUtil
 		}
 		return $reponseMap;
 	}
+	
+	public static function getEmptyJSONObject()
+	{
+		return new ArrayObject();
+	}
 }
 ?>
