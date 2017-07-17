@@ -510,6 +510,10 @@ class ZCRMModule
     {
     	return MassEntityAPIHandler::getInstance($this)->createRecords($records);
     }
+    public function upsertRecords($records)
+    {
+    	return MassEntityAPIHandler::getInstance($this)->upsertRecords($records);
+    }
     public function deleteRecords($entityIds)
     {
     	return MassEntityAPIHandler::getInstance($this)->deleteRecords($entityIds);
@@ -526,6 +530,5 @@ class ZCRMModule
     {
     	return MassEntityAPIHandler::getInstance($this)->getPermanentlyDeletedRecords();
     }
-
 }
 ?>
