@@ -344,6 +344,14 @@ class ZCRMRecord
     	return EntityAPIHandler::getInstance($this)->deletePhoto();
     }
 
+    public function addRelation(ZCRMJunctionRecord $junctionRecord)
+    {
+    	return ZCRMModuleRelation::getInstance($this, $junctionRecord)->addRelation();
+    }
+    public function removeRelation(ZCRMJunctionRecord $junctionRecord)
+    {
+    	return ZCRMModuleRelation::getInstance($this, $junctionRecord)->removeRelation();
+    }
 
     /**
      * properties

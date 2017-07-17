@@ -71,6 +71,59 @@ class MassEntityAPIHandler extends APIHandler
 		}
 	}
 	
+	public function upsertRecords($records)
+	{
+		if(sizeof($records) > 100)
+		{
+			throw new ZCRMException(APIConstants::API_MAX_RECORDS_MSG,APIConstants::RESPONSECODE_BAD_REQUEST);
+		}
+		try{
+			$this->urlPath=$this->module->getAPIName()."/upsert";
+			$this->requestMethod=APIConstants::REQUEST_METHOD_POST;
+			$this->addHeader("Content-Type","application/json");
+			$requestBodyObj = array();
+			$dataArray = array();
+			foreach ($records as $record)
+			{
+				$recordJSON=EntityAPIHandler::getInstance($record)->getZCRMRecordAsJSON();
+				if($record->getEntityId()!=null)
+				{
+					$recordJSON['id']=$record->getEntityId();
+				}
+				array_push($dataArray,$recordJSON);
+			}
+			$requestBodyObj["data"]=$dataArray;
+			$this->requestBody = $requestBodyObj;
+				
+			//Fire Request
+			$bulkAPIResponse = APIRequest::getInstance($this)->getBulkAPIResponse();
+			$upsertRecords=array();
+			$responses=$bulkAPIResponse->getEntityResponses();
+			$size=sizeof($responses);
+			for($i=0;$i<$size;$i++)
+			{
+				$entityResIns=$responses[$i];
+				if(APIConstants::CODE_SUCCESS===$entityResIns->getStatus())
+				{
+					$responseData = $entityResIns->getResponseJSON();
+					$recordDetails = $responseData["details"];
+					$newRecord = $records[$i];
+					EntityAPIHandler::getInstance($newRecord)->setRecordProperties($recordDetails);
+					array_push($upsertRecords,$newRecord);
+					$entityResIns->setData($newRecord);
+				}
+				else
+				{
+					$entityResIns->setData(null);
+				}
+			}
+			$bulkAPIResponse->setData($upsertRecords);
+			return $bulkAPIResponse;
+		}catch (ZCRMException $e){
+			throw $e;
+		}
+	}
+	
 	public function deleteRecords($entityIds)
 	{
 		if(sizeof($entityIds) > 100)
@@ -102,7 +155,73 @@ class MassEntityAPIHandler extends APIHandler
 			throw $exception;
 		}
 	}
+	public function getAllDeletedRecords() 
+	{
+		return self::getDeletedRecords("all");
+	}
+	
+	public function getRecycleBinRecords()
+	{
+		return self::getDeletedRecords("recycle");
+	}
+	
+	public function getPermanentlyDeletedRecords()
+	{
+		return self::getDeletedRecords("permanent");
+	}
+	
+	private function getDeletedRecords($type)
+	{
+		try
+		{
+			$this->urlPath=$this->module->getAPIName()."/deleted";
+			$this->requestMethod=APIConstants::REQUEST_METHOD_GET;
+			$this->addHeader("Content-Type","application/json");
+			$this->addParam("type",$type);
 			
+			$responseInstance=APIRequest::getInstance($this)->getBulkAPIResponse();
+			$responseJSON=$responseInstance->getResponseJSON();
+			$trashRecords=$responseJSON["data"];
+			$trashRecordList=array();
+			foreach ($trashRecords as $trashRecord)
+			{
+				$trashRecordInstance = ZCRMTrashRecord::getInstance($trashRecord['type'],$trashRecord['id']);
+				self::setTrashRecordProperties($trashRecordInstance,$trashRecord);
+				array_push($trashRecordList,$trashRecordInstance);
+			}
+			
+			$responseInstance->setData($trashRecordList);
+				
+			return $responseInstance;
+		}
+		catch (ZCRMException $exception)
+		{
+			APIExceptionHandler::logException($exception);
+			throw $exception;
+		}
+	}
+
+	public function setTrashRecordProperties($trashRecordInstance,$recordProperties)
+	{
+		if($recordProperties['display_name']!=null)
+		{
+			$trashRecordInstance->setDisplayName($recordProperties['display_name']);
+		}
+		if($recordProperties['created_by']!=null)
+		{
+			$createdBy=$recordProperties['created_by'];
+			$createdBy_User=ZCRMUser::getInstance($createdBy['id'], $createdBy['name']);
+			$trashRecordInstance->setCreatedBy($createdBy_User);
+		}
+		if($recordProperties['deleted_by']!=null)
+		{
+			$deletedBy=$recordProperties['deleted_by'];
+			$deletedBy_User=ZCRMUser::getInstance($deletedBy['id'], $deletedBy['name']);
+			$trashRecordInstance->setDeletedBy($deletedBy_User);
+		}
+		$trashRecordInstance->setDeletedTime($recordProperties['deleted_time']);
+		
+	}
 	public function getRecords($cvId, $sortByField, $sortOrder, $page,$perPage)
 	{
 		try{

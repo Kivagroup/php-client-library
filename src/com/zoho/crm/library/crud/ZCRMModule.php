@@ -514,6 +514,18 @@ class ZCRMModule
     {
     	return MassEntityAPIHandler::getInstance($this)->deleteRecords($entityIds);
     }
+    public function getAllDeletedRecords()
+    {
+    	return MassEntityAPIHandler::getInstance($this)->getAllDeletedRecords();
+    }
+    public function getRecycleBinRecords()
+    {
+    	return MassEntityAPIHandler::getInstance($this)->getRecycleBinRecords();
+    }
+    public function getPermanentlyDeletedRecords()
+    {
+    	return MassEntityAPIHandler::getInstance($this)->getPermanentlyDeletedRecords();
+    }
 
 }
 ?>

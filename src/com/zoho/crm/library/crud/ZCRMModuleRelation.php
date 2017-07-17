@@ -11,9 +11,9 @@ class ZCRMModuleRelation
 	private $visible=null;
 	
 	private $parentRecord=null;
+	private $junctionRecord;
 	
-	
-	private function __construct($parentModuleAPINameOrParentRecord,$relatedListAPIName)
+	private function __construct($parentModuleAPINameOrParentRecord,$relatedListAPINameOrJunctionRecord)
 	{
 		if($parentModuleAPINameOrParentRecord instanceof ZCRMRecord)
 		{
@@ -23,7 +23,14 @@ class ZCRMModuleRelation
 		{
 			$this->parentModuleAPIName=$parentModuleAPINameOrParentRecord;
 		}
-		$this->apiName=$relatedListAPIName;
+		
+		if($relatedListAPINameOrJunctionRecord instanceof ZCRMJunctionRecord)
+		{
+			$this->junctionRecord=$relatedListAPINameOrJunctionRecord;
+		}
+		else {
+			$this->apiName=$relatedListAPINameOrJunctionRecord;
+		}
 	}
 	public static function getInstance($parentModuleAPINameOrParentRecord,$relatedListAPIName)
 	{
@@ -76,6 +83,14 @@ class ZCRMModuleRelation
 	public function deleteAttachment($attachmentId)
 	{
 		return RelatedListAPIHandler::getInstance($this->parentRecord,$this)->deleteAttachment($attachmentId);
+	}
+	public function addRelation()
+	{
+		return RelatedListAPIHandler::getInstance($this->parentRecord, $this->junctionRecord)->addRelation();
+	}
+	public function removeRelation()
+	{
+		return RelatedListAPIHandler::getInstance($this->parentRecord, $this->junctionRecord)->removeRelation();
 	}
 	
 

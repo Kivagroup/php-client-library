@@ -10,11 +10,18 @@ class RelatedListAPIHandler extends APIHandler
 {
 	private $parentRecord=null;//ZCRMRecord
 	private $relatedList=null;//ZCRMModuleRelation
+	private $junctionRecord;
 	
 	private function __construct($parentRecord,$relatedList)
 	{
 		$this->parentRecord=$parentRecord;
-		$this->relatedList=$relatedList;
+		if($relatedList instanceof ZCRMModuleRelation)
+		{
+			$this->relatedList=$relatedList;
+		}
+		else {
+			$this->junctionRecord=$relatedList;
+		}
 	}
 	
 	public static function getInstance($parentRecord,$relatedList)
@@ -258,6 +265,43 @@ class RelatedListAPIHandler extends APIHandler
 			APIExceptionHandler::logException($exception);
 			throw $exception;
 		}
+	}
+	public function addRelation() 
+	{
+		try{
+			$this->requestMethod=APIConstants::REQUEST_METHOD_PUT;
+			$this->urlPath=$this->parentRecord->getModuleApiName()."/".$this->parentRecord->getEntityId()."/".$this->junctionRecord->getApiName()."/".$this->junctionRecord->getId();
+			
+			$dataArray=$this->junctionRecord->getRelatedDetails();
+			$inputJSON=array("data"=>array($dataArray));
+			$this->requestBody=json_encode($inputJSON);
+			return APIRequest::getInstance($this)->getAPIResponse();
+		}
+		catch (ZCRMException $exception)
+		{
+			APIExceptionHandler::logException($exception);
+			throw $exception;
+		}
+	}
+	public function removeRelation()
+	{
+		try{
+			$this->requestMethod=APIConstants::REQUEST_METHOD_DELETE;
+			$this->urlPath=$this->parentRecord->getModuleApiName()."/".$this->parentRecord->getEntityId()."/".$this->junctionRecord->getApiName()."/".$this->junctionRecord->getId();
+				
+			return APIRequest::getInstance($this)->getAPIResponse();
+		}
+		catch (ZCRMException $exception)
+		{
+			APIExceptionHandler::logException($exception);
+			throw $exception;
+		}
+	}
+	
+	public function getRelationDetailsAsJSON($relatedDetails)
+	{
+		$relatedDetailsJSON=array();
+		
 	}
 	
 	public function getZCRMNoteAsJSON($noteIns)
