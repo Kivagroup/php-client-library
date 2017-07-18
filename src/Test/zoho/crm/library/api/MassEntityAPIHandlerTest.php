@@ -16,8 +16,10 @@ class MassEntityAPIHandlerTest
 		self::$filePointer=$fp;
 		self::testCreateRecords();
 		self::testUpdateRecords();
+		self::testUpsertRecords();
 		self::testGetRecords();
 		self::testDeleteRecords();
+		self::testGetDeletedRecords();
 	}
 	public function testCreateRecords()
 	{
@@ -40,11 +42,11 @@ class MassEntityAPIHandlerTest
 				{
 					continue;
 				}
-				self::setRecordFieldsAndValidate($apiName,$startTime,$endTime);
+				self::setRecordFieldsAndValidate($apiName,$startTime,$endTime,"create");
 			}catch (ZCRMException $e)
 			{
 				$endTime=$endTime==0?microtime(true)*1000:$endTime;
-				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord','create',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleName.')','create',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
 			}
 		}
 	}
@@ -80,7 +82,37 @@ class MassEntityAPIHandlerTest
 		catch (ZCRMException $e)
 		{
 			$endTime=$endTime==0?microtime(true)*1000:$endTime;
-			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord','update',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleName.')','update',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+		}
+	}
+	
+	public function testUpsertRecords()
+	{
+		if(sizeof(MetaDataAPIHandlerTest::$moduleList)<=0)
+		{
+			throw new ZCRMException("No Modules fetched..");
+		}
+	
+		$moduleList=TestUtil::moveModulePositions(true,array("Products"),MetaDataAPIHandlerTest::$moduleList);
+		foreach ($moduleList as $apiName=>$moduleName)
+		{
+			$startTime=microtime(true)*1000;
+			$endTime=0;
+			try{
+				if(in_array($moduleName, TestUtil::$nonSupportiveModules))
+				{
+					continue;
+				}
+				else if($moduleName=='Attachments' || $moduleName=='Notes')
+				{
+					continue;
+				}
+				self::setRecordFieldsAndValidate($apiName,$startTime,$endTime,"upsert");
+			}catch (ZCRMException $e)
+			{
+				$endTime=$endTime==0?microtime(true)*1000:$endTime;
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleName.')','upsertRecords',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+			}
 		}
 	}
 	
@@ -154,6 +186,91 @@ class MassEntityAPIHandlerTest
 		{
 			$endTime=$endTime==0?microtime(true)*1000:$endTime;
 			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.')','testDeleteRecord',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+		}
+	}
+	
+	public function testGetDeletedRecords()
+	{
+	
+		if(sizeof(MetaDataAPIHandlerTest::$moduleList)<=0)
+		{
+			throw new ZCRMException("No Modules fetched..");
+		}
+		try{
+			foreach (MetaDataAPIHandlerTest::$moduleList as $apiName=>$moduleName)
+			{
+				$startTime=microtime(true)*1000;
+				$endTime=0;
+				try{
+					if(in_array($moduleName, TestUtil::$nonSupportiveModules))
+					{
+						continue;
+					}
+					if($moduleName=='Attachments' || $moduleName=='Notes')
+					{
+						continue;
+					}
+					self::validateGetDeletedRecordsResponse($apiName,$startTime,$endTime);
+				}catch (ZCRMException $e)
+				{
+					$endTime=$endTime==0?microtime(true)*1000:$endTime;
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.')','testGetDeletedRecords',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+				}
+					
+			}
+		}
+		catch (ZCRMException $e)
+		{
+			$endTime=$endTime==0?microtime(true)*1000:$endTime;
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.')','testGetDeletedRecords',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+		}
+	}
+	
+	public function validateGetDeletedRecordsResponse($apiName,$startTime,$endTime)
+	{
+		$types=array("all","recycle","permanent");
+		try {
+			foreach ($types as $type)
+			{
+				Main::incrementTotalCount();
+				$startTime=microtime(true)*1000;
+				$moduleIns=ZCRMModule::getInstance($apiName);
+				$bulkResponseIns=null;
+				$methodName="getAllDeletedRecords()";
+				if($type=='all')
+				{
+					$bulkResponseIns=$moduleIns->getAllDeletedRecords();
+				}
+				elseif ($type=='recycle')
+				{
+					$bulkResponseIns=$moduleIns->getRecycleBinRecords();
+					$methodName="getRecycleBinRecords()";
+				}
+				elseif ($type=='permanent')
+				{
+					$bulkResponseIns=$moduleIns->getPermanentlyDeletedRecords();
+					$methodName="getPermanentlyDeletedRecords()";
+				}
+				$endTime=microtime(true)*1000;
+				$trashRecords=$bulkResponseIns->getData();
+				if($bulkResponseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK && $bulkResponseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_NO_CONTENT)
+				{
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.")",'validateGetDeletedRecordsResponse',"Deleted Records GET Failed",$bulkResponseIns->getMessage(),'failure',($endTime-$startTime));
+					return;
+				}
+				$deletedIdList=array();
+				foreach ($trashRecords as $trashRecord)
+				{
+					array_push($deletedIdList,$trashRecord->getEntityId());
+				}
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$apiName.")",$methodName,"Deleted Records fetched successfully","ID List:".json_encode($deletedIdList),'success',($endTime-$startTime));
+				unset($deletedIdList);
+			}
+		}
+		catch (ZCRMException $e)
+		{
+			$endTime=$endTime==0?microtime(true)*1000:$endTime;
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.")",'validateGetDeletedRecordsResponse',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
 		}
 	}
 	
@@ -315,7 +432,7 @@ class MassEntityAPIHandlerTest
 		}
 	}
 	
-	public function setRecordFieldsAndValidate($moduleAPIName,$startTime,$endTime)
+	public function setRecordFieldsAndValidate($moduleAPIName,$startTime,$endTime,$method)
 	{
 		try{
 			$moduleFields=MetaDataAPIHandlerTest::$moduleVsFieldMap[$moduleAPIName];
@@ -325,6 +442,8 @@ class MassEntityAPIHandlerTest
 			{
 				$recordsArray=array();
 				Main::incrementTotalCount();
+				$moduleTextField=null;
+				$productDetailsAPIName=null;
 				for($index=0;$index<self::$createLimit;$index++)
 				{
 					$zcrmrecord=ZCRMRecord::getInstance($moduleAPIName, null);
@@ -385,6 +504,10 @@ class MassEntityAPIHandlerTest
 						{
 							$val=$fieldLabel.rand(1,19);
 							$zcrmrecord->setFieldValue($fieldAPIName,$val);
+							if($moduleTextField==null && $fieldLabel!='Product Details')
+							{
+								$moduleTextField=$fieldAPIName;
+							}
 						}
 						elseif($dataType=='datetime')
 						{
@@ -412,6 +535,7 @@ class MassEntityAPIHandlerTest
 							$productObj=array("id"=>self::$productId);
 							$productDetailsObj=array("product"=>$productObj,"quantity"=>150);
 							$zcrmrecord->setFieldValue($fieldAPIName,array($productDetailsObj));
+							$productDetailsAPIName=$fieldAPIName;
 						}
 						elseif($fieldLabel=='Call Duration' && $moduleName=='Calls')
 						{
@@ -419,18 +543,39 @@ class MassEntityAPIHandlerTest
 						}
 						elseif($fieldLabel=='Participants' && $moduleName=='Events')
 						{
-							$participantObj=array("type"=>"user","participant"=>UserAPIHandlerTest::$userIdList[0]);
+							$participantObj=array("type"=>"user","participant"=>OrganizationAPIHandlerTest::$userIdList[0]);
 							$zcrmrecord->setFieldValue($fieldAPIName,array($participantObj));
 						}
 					}
 					array_push($recordsArray, $zcrmrecord);
 					unset($zcrmrecord);
 				}
-				$isValid=self::validateCreateResponse($recordsArray, $moduleAPIName, $startTime, $endTime);
-				if($isValid)
+				if($method=="upsert")
 				{
-					$endTime=$endTime==0?microtime(true)*1000:$endTime;
-					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleAPIName.")",'createRecords',"Records Created Successfully","Entity Id List::".json_encode(self::$moduleApiNameVsEntityIds[$moduleAPIName]),'success',($endTime-$startTime));
+					$zcrmrecord=ZCRMRecord::getInstance($moduleAPIName, self::$moduleApiNameVsEntityIds[$moduleAPIName]);
+					if($moduleName=='Quotes' || $moduleName=='SalesOrders' || $moduleName=='PurchaseOrders'|| $moduleName='Invoices')
+					{
+						$productObj=array("id"=>self::$productId);
+						$productDetailsObj=array("product"=>$productObj,"quantity"=>150);
+						$zcrmrecord->setFieldValue($productDetailsAPIName,array($productDetailsObj));
+					}
+					$zcrmrecord->setFieldValue($moduleTextField, "Upsert_Text");
+					array_push($recordsArray, $zcrmrecord);
+					$successIds=self::validateUpsertResponse($recordsArray, $moduleAPIName, $startTime, $endTime,$zcrmrecord->getEntityId());
+					if($successIds!=null && sizeof($successIds)>0)
+					{
+						$endTime=$endTime==0?microtime(true)*1000:$endTime;
+						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleAPIName.")",'upsertRecords',"Records upsert completed Successfully","Entity Id List::".json_encode($successIds),'success',($endTime-$startTime));
+					}
+				}
+				else 
+				{
+					$isValid=self::validateCreateResponse($recordsArray, $moduleAPIName, $startTime, $endTime);
+					if($isValid)
+					{
+						$endTime=$endTime==0?microtime(true)*1000:$endTime;
+						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$moduleAPIName.")",'createRecords',"Records Created Successfully","Entity Id List::".json_encode(self::$moduleApiNameVsEntityIds[$moduleAPIName]),'success',($endTime-$startTime));
+					}
 				}
 				unset($recordsArray);
 			}
@@ -477,6 +622,38 @@ class MassEntityAPIHandlerTest
 			$endTime=$endTime==0?microtime(true)*1000:$endTime;
 			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateCreateResponse',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
 			return false;
+		}
+	}
+	
+	public function validateUpsertResponse($recordsArray,$moduleAPIName,$startTime,$endTime,$updateEntityId)
+	{
+		try{
+			$startTime=microtime(true)*1000;
+			$moduleIns=ZCRMModule::getInstance($moduleAPIName);
+			$bulkResponseIns=$moduleIns->upsertRecords($recordsArray);
+			$endTime=microtime(true)*1000;
+			$upsertRecords=$bulkResponseIns->getData();
+			$entityResponses=$bulkResponseIns->getEntityResponses();
+			foreach ($entityResponses as $entityResponseIns)
+			{
+				if(APIConstants::CODE_SUCCESS!=$entityResponseIns->getStatus() || ("record added"!=$entityResponseIns->getMessage() && "record updated"!=$entityResponseIns->getMessage()))
+				{
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateUpsertResponse',"Record Upsert Failed1",json_encode($entityResponseIns->getResponseJSON()),'failure',($endTime-$startTime));
+					continue;
+				}
+			}
+			$successIds=array();
+			foreach ($upsertRecords as $record)
+			{
+				array_push($successIds,$record->getEntityId());
+			}
+			return $successIds;
+		}
+		catch (ZCRMException $e)
+		{
+			$endTime=$endTime==0?microtime(true)*1000:$endTime;
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateUpsertResponse',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+			return null;
 		}
 	}
 	

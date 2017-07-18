@@ -1,7 +1,7 @@
 <?php
 require_once realpath(dirname(__FILE__)."/../Main.php");
 require_once realpath(dirname(__FILE__)."/../common/Helper.php");
-class UserAPIHandlerTest
+class OrganizationAPIHandlerTest
 {
 	public static $profileNameVsIdMap=array();
 	public static $roleNameVsIdMap=array();
@@ -15,17 +15,40 @@ class UserAPIHandlerTest
 	private static $userTypeVsMethod=array("ActiveUsers"=>"getAllActiveUsers","DeactiveUsers"=>"getAllDeactiveUsers","ConfirmedUsers"=>"getAllConfirmedUsers","NotConfirmedUsers"=>"getAllNotConfirmedUsers","DeletedUsers"=>"getAllDeletedUsers","ActiveConfirmedUsers"=>"getAllActiveConfirmedUsers","AdminUsers"=>"getAllAdminUsers","ActiveConfirmedAdmins"=>"getAllActiveConfirmedAdmins","CurrentUser"=>"getCurrentUser");
 	public static function test($fp)
 	{
-		$ins=new UserAPIHandlerTest();
+		$ins=new OrganizationAPIHandlerTest();
 		self::$filePointer=$fp;
+		$ins->testGetOrganizationDetails();
 		$ins->testGetAllProfiles();
 		$ins->testGetAllRoles();
 		$ins->testGetProfile();
 		$ins->testGetRole();
 		$ins->testGetAllUsers();
-		
 		$ins->testCreateUsers();
 		$ins->testGetUser();
 		$ins->testSpecificUsers();
+	}
+	
+	public function testGetOrganizationDetails()
+	{
+		try{
+			Main::incrementTotalCount();
+			$startTime=microtime(true)*1000;
+			$endTime=0;
+			$restIns=ZCRMRestClient::getInstance();
+			$responseInstance=$restIns->getOrganizationDetails();
+			$zcrmOrganization=$responseInstance->getData();
+			$endTime=microtime(true)*1000;
+			if($zcrmOrganization->getOrgId()==null || $zcrmOrganization->getCompanyName()==null || $zcrmOrganization->getPrimaryEmail()==null || $zcrmOrganization->getPrimaryZuid()==null || $zcrmOrganization->getZgid()==null || $zcrmOrganization->getTimeZone()==null || $zcrmOrganization->getCurrencyLocale()==null)
+			{
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getOrganizationDetails',"Invalid Response","Org details not fetched properly",'failure',($endTime-$startTime));
+				return;
+			}
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getOrganizationDetails',"Org Details Fetched Successfully!!",null,'success',($endTime-$startTime));
+		}catch (ZCRMException $e)
+		{
+			$endTime=$endTime==0?microtime(true)*1000:$endTime;
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getOrganizationDetails',$e->getMessage(),$e->getExceptionDetails(),'failure',($endTime-$startTime));
+		}
 	}
 	
 	public function testGetAllProfiles()
@@ -248,7 +271,7 @@ class UserAPIHandlerTest
 		try{
 			Main::incrementTotalCount();
 			$orgIns=ZCRMOrganization::getInstance();
-			$responseIns=$orgIns->createUsers($userJSONArray);
+			$responseIns=$orgIns->createUser($zcrmUser);
 			$endTime=microtime(true)*1000;
 			$responseJSON=$responseIns->getResponseJSON()['users'][0];
 			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || !($responseJSON['code']=='DUPLICATE_DATA'||$responseJSON['code']=='SUCCESS'))
@@ -356,9 +379,6 @@ class UserAPIHandlerTest
 		{
 			throw new ZCRMException("Invalid User fetched");
 		}
-		
 	}
-	
-	
 }
 ?>

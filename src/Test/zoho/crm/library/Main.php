@@ -4,7 +4,7 @@ require_once './api/MetaDataAPIHandlerTest.php';
 require_once './api/EntityAPIHandlerTest.php';
 require_once './api/ModuleAPIHandlerTest.php';
 require_once './api/RelatedListAPIHandlerTest.php';
-require_once './api/UserAPIHandlerTest.php';
+require_once './api/OrganizationAPIHandlerTest.php';
 require_once './api/MassEntityAPIHandlerTest.php';
 require_once './common/Helper.php';
 
@@ -30,7 +30,7 @@ class Main
 			$fp=fopen($fileName, "w+");
 			$header="<html><head>Report</head><body><h1><center><b><i> PHP Client Library Test Report</i></b></center></h1><hr><br><table border=\"1\" width=\"100%\" cellspacing=\"2\" cellpadding=\"10\"><tr bgcolor=\"B7B2B2\"><td><b><center>SL no.</center></b></td><td><b><center>Class Name</center></b></td><td><b><center>Method Name</center></b></td><td><b><center>Message</center></b></td><td><b><center>Exception</center></b></td><td><b><center>Status</center></b></td><td><b><center>Time Taken(in milliseconds)</center></b></td></tr>";
 			fwrite($fp, $header);
-			UserAPIHandlerTest::test($fp);
+			OrganizationAPIHandlerTest::test($fp);
 			MetaDataAPIHandlerTest::test($fp);
 			ModuleAPIHandlerTest::test($fp);
 			EntityAPIHandlerTest::test($fp);

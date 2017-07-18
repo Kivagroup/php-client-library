@@ -1,5 +1,6 @@
 <?php
 require_once realpath(dirname(__FILE__)."/../../../../../com/zoho/crm/library/api/handler/EntityAPIHandler.php");
+require_once realpath(dirname(__FILE__)."/../../../../../com/zoho/crm/library/crud/ZCRMJunctionRecord.php");
 require_once 'MetaDataAPIHandlerTest.php';
 require_once realpath(dirname(__FILE__)."/../common/TestUtil.php");
 
@@ -16,7 +17,62 @@ class EntityAPIHandlerTest
 		self::testCreateRecord();
 		self::testUpdateRecord();
 		self::testGetRecord();
+		self::testAddRelation();
+		self::testRemoveRelation();
 		self::testDeleteRecord();
+	}
+	
+	public function testAddRelation()
+	{
+		$productId=self::$moduleApiNameVsEntityId[MetaDataAPIHandlerTest::$moduleNameVsApiName["Products"]];
+		$priceBookId=self::$moduleApiNameVsEntityId[MetaDataAPIHandlerTest::$moduleNameVsApiName["PriceBooks"]];
+		$startTime=microtime(true)*1000;
+		$endTime=0;
+		try{
+			Main::incrementTotalCount();
+			$parentRecord=ZCRMRecord::getInstance("Products", $productId);
+			$junctionRecord=ZCRMJunctionRecord::getInstance("Products", $priceBookId);
+			$responseIns=$parentRecord->addRelation($junctionRecord);
+			$endTime=microtime(true)*1000;
+			if($responseIns->getHttpStatus!=APIConstants::RESPONSECODE_OK || "relation added"!=$responseIns->getMessage())
+			{
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'addRelation(Price_Books,'.$priceBookId.")",$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+				return;
+			}
+			
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'addRelation(Price_Books,'.$priceBookId.")","Relation added successfully",$responseIns->getDetails()['id'],'success',($endTime-$startTime));
+		}
+		catch (ZCRMException $e)
+		{
+			$endTime=$endTime==0?microtime(true)*1000:$endTime;
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'addRelation(Price_Books,'.$priceBookId.")",$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+		}
+	}
+	public function testRemoveRelation()
+	{
+		$productId=self::$moduleApiNameVsEntityId[MetaDataAPIHandlerTest::$moduleNameVsApiName["Products"]];
+		$priceBookId=self::$moduleApiNameVsEntityId[MetaDataAPIHandlerTest::$moduleNameVsApiName["PriceBooks"]];
+		$startTime=microtime(true)*1000;
+		$endTime=0;
+		try{
+			Main::incrementTotalCount();
+			$parentRecord=ZCRMRecord::getInstance("Products", $productId);
+			$junctionRecord=ZCRMJunctionRecord::getInstance("Products", $priceBookId);
+			$responseIns=$parentRecord->removeRelation($junctionRecord);
+			$endTime=microtime(true)*1000;
+			if($responseIns->getHttpStatus!=APIConstants::RESPONSECODE_OK || "relation removed"!=$responseIns->getMessage())
+			{
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'removeRelation(Price_Books,'.$priceBookId.")",$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+				return;
+			}
+				
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'removeRelation(Price_Books,'.$priceBookId.")","Relation added successfully",$responseIns->getDetails()['id'],'success',($endTime-$startTime));
+		}
+		catch (ZCRMException $e)
+		{
+			$endTime=$endTime==0?microtime(true)*1000:$endTime;
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'removeRelation(Price_Books,'.$priceBookId.")",$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+		}
 	}
 	public function testCreateRecord()
 	{
@@ -348,7 +404,7 @@ class EntityAPIHandlerTest
 					}
 					elseif($fieldLabel=='Participants' && $moduleName=='Events')
 					{
-						$participantObj=array("type"=>"user","participant"=>UserAPIHandlerTest::$userIdList[0]);
+						$participantObj=array("type"=>"user","participant"=>OrganizationAPIHandlerTest::$userIdList[0]);
 						$zcrmrecord->setFieldValue($fieldAPIName,array($participantObj));
 					}
 				}
@@ -506,7 +562,7 @@ class EntityAPIHandlerTest
 					}
 					elseif($fieldLabel=='Participants' && $moduleName=='Events')
 					{
-						$participantObj=array("type"=>"user","participant"=>UserAPIHandlerTest::$userIdList[0]);
+						$participantObj=array("type"=>"user","participant"=>OrganizationAPIHandlerTest::$userIdList[0]);
 						$zcrmrecord->setFieldValue($fieldAPIName,array($participantObj));
 					}
 				}
