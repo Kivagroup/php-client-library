@@ -10,7 +10,7 @@ require_once realpath(dirname(__FILE__).'/../../exception/ZCRMException.php');
  * @author sumanth-3058
  *
  */
-class UserAPIHandler extends APIHandler
+class OrganizationAPIHandler extends APIHandler
 {
 	private function __construct()
 	{
@@ -19,9 +19,67 @@ class UserAPIHandler extends APIHandler
 	
 	public static function getInstance()
 	{
-		return new UserAPIHandler();
+		return new OrganizationAPIHandler();
 	}
 	
+	public function getOrganizationDetails()
+	{
+		try{
+			$this->urlPath="org";
+			$this->requestMethod=APIConstants::REQUEST_METHOD_GET;
+			$this->addHeader("Content-Type","application/json");
+			$responseInstance=APIRequest::getInstance($this)->getAPIResponse();
+			$responseJSON=$responseInstance->getResponseJSON();
+			$orgDetails=$responseJSON['org'][0];
+			$responseInstance->setData(self::setOrganizationDetails($orgDetails));
+				
+			return $responseInstance;
+		}catch (ZCRMException $exception)
+		{
+			APIExceptionHandler::logException($exception);
+			throw $exception;
+		}
+	}
+	
+	public function setOrganizationDetails($orgDetails)
+	{
+		$orgInsatance=ZCRMOrganization::getInstance($orgDetails['company_name'], $orgDetails['id']);
+		$orgInsatance->setAlias($orgDetails['alias']);
+		$orgInsatance->setCity($orgDetails['city']);
+		$orgInsatance->setCountry($orgDetails['country']);
+		$orgInsatance->setCountryCode($orgDetails['country_code']);
+		$orgInsatance->setCurrencyLocale($orgDetails['currency_locale']);
+		$orgInsatance->setCurrencySymbol($orgDetails['currency_symbol']);
+		$orgInsatance->setDescription($orgDetails['description']);
+		$orgInsatance->setEmployeeCount($orgDetails['employee_count']);
+		$orgInsatance->setFax($orgDetails['fax']);
+		$orgInsatance->setGappsEnabled((boolean)$orgDetails['gapps_enabled']);
+		$orgInsatance->setIsoCode($orgDetails['iso_code']);
+		$orgInsatance->setMcStatus($orgDetails['mc_status']);
+		$orgInsatance->setMobile($orgDetails['mobile']);
+		
+		$orgInsatance->setPhone($orgDetails['phone']);
+		$orgInsatance->setPrimaryEmail($orgDetails['primary_email']);
+		$orgInsatance->setPrimaryZuid($orgDetails['primary_zuid']);
+		$orgInsatance->setState($orgDetails['state']);
+		$orgInsatance->setStreet($orgDetails['street']);
+		$orgInsatance->setTimeZone($orgDetails['time_zone']);
+		$orgInsatance->setWebsite($orgDetails['website']);
+		$orgInsatance->setZgid($orgDetails['zgid']);
+		$orgInsatance->setZipCode($orgDetails['zip']);
+		
+		$license_details=$orgDetails['license_details'];
+		if($license_details!=null)
+		{
+			$orgInsatance->setPaidAccount((boolean)$license_details['paid']);
+			$orgInsatance->setPaidType($license_details['paid_type']);
+			$orgInsatance->setPaidExpiry($license_details['paid_expiry']);
+			$orgInsatance->setTrialExpiry($license_details['trial_expiry']);
+			$orgInsatance->setTrialType($license_details['trial_type']);
+		}
+		
+		return $orgInsatance;
+	}
 	public function getAllRoles()
 	{
 		try{

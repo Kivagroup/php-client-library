@@ -10,6 +10,7 @@ require_once 'com/zoho/crm/library/api/handler/MassEntityAPIHandler.php';
 require_once 'com/zoho/crm/library/api/handler/MetaDataAPIHandler.php';
 require_once 'com/zoho/crm/library/api/handler/ModuleAPIHandler.php';
 require_once 'com/zoho/crm/library/api/handler/RelatedListAPIHandler.php';
+require_once 'com/zoho/crm/library/api/handler/OrganizationAPIHandler.php';
 
 
 //crud operation related

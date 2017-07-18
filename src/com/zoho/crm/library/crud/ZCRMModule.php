@@ -428,7 +428,7 @@ class ZCRMModule
      * Returns the custom view details of the module.
      * @return instance of custom views of the module
      */
-    public function getCustomViewDetails($customViewId)
+    public function getCustomView($customViewId)
     {
     	return ModuleAPIHandler::getInstance($this)->getCustomView($customViewId);
     }

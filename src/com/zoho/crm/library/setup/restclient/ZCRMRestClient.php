@@ -47,12 +47,17 @@ class ZCRMRestClient
 	
 	public function getCurrentUser()
 	{
-		return UserAPIHandler::getInstance()->getCurrentUser();
+		return OrganizationAPIHandler::getInstance()->getCurrentUser();
 	}
 	
 	public static function getCurrentUserEmailID()
 	{
 		return isset($_SERVER[APIConstants::USER_EMAIL_ID])?$_SERVER[APIConstants::USER_EMAIL_ID]:null;
+	}
+	
+	public static function getOrganizationDetails()
+	{
+		return OrganizationAPIHandler::getInstance()->getOrganizationDetails(); 
 	}
 }
 ?>
