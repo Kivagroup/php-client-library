@@ -10,7 +10,7 @@ class RelatedListAPIHandler extends APIHandler
 {
 	private $parentRecord=null;//ZCRMRecord
 	private $relatedList=null;//ZCRMModuleRelation
-	private $junctionRecord;
+	private $junctionRecord;//ZCRMJunctionRecord
 	
 	private function __construct($parentRecord,$relatedList)
 	{
@@ -19,7 +19,8 @@ class RelatedListAPIHandler extends APIHandler
 		{
 			$this->relatedList=$relatedList;
 		}
-		else {
+		else 
+		{
 			$this->junctionRecord=$relatedList;
 		}
 	}
@@ -300,12 +301,6 @@ class RelatedListAPIHandler extends APIHandler
 			APIExceptionHandler::logException($exception);
 			throw $exception;
 		}
-	}
-	
-	public function getRelationDetailsAsJSON($relatedDetails)
-	{
-		$relatedDetailsJSON=array();
-		
 	}
 	
 	public function getZCRMNoteAsJSON($noteIns)

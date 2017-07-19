@@ -131,7 +131,7 @@ class EntityAPIHandler extends APIHandler
 			}
 			if($potentialRecord!=null)
 			{
-				$dataObject['potential']=self::getInstance($potentialRecord)->getZCRMRecordAsJSON();
+				$dataObject['Deals']=self::getInstance($potentialRecord)->getZCRMRecordAsJSON();
 			}
 			if(sizeof($dataObject)>0)
 			{
@@ -259,9 +259,23 @@ class EntityAPIHandler extends APIHandler
 		{
 			$recordJSON["Pricing_Details"]=self::getPriceDetailsAsJSONArray();
 		}
+		if(sizeof($this->record->getTaxList())>0)
+		{
+			$recordJSON["Tax"]=self::getTaxListAsJSON();
+		}
 		return array_filter($recordJSON);
 	}
 	
+	public function getTaxListAsJSON()
+	{
+		$taxes = array();
+		$taxList = $this->record->getTaxList();
+		foreach ($taxList as $taxIns)
+		{
+			array_push($taxes,$taxIns->getTaxName());
+		}
+		return taxes;
+	}
 	public function getPriceDetailsAsJSONArray()
 	{
 		$priceDetailsArr = array();
@@ -422,6 +436,14 @@ class EntityAPIHandler extends APIHandler
 			{
 				$handler = ZCRMUser::getInstance($value["id"], $value["name"]);
 				$this->record->setFieldValue($key, $handler);
+			}
+			else if ("Tax"===$key && is_array($value))
+			{
+				foreach ($value as $taxName)
+				{
+					$taxIns=ZCRMTax::getInstance($taxName);
+					$this->record->addTax($taxIns);
+				}
 			}
 			else if(substr($key,0,1)=="$")
 			{

@@ -9,6 +9,7 @@ class EntityResponse
 	private $code=null;
 	private $responseJSON=null;
 	private $data=null;
+	private $upsertDetails=array();
 	
 	public function __construct($entityResponseJSON)
 	{
@@ -16,6 +17,15 @@ class EntityResponse
 		$this->status=$entityResponseJSON[APIConstants::STATUS];
 		$this->message=$entityResponseJSON[APIConstants::MESSAGE];
 		$this->code=$entityResponseJSON[APIConstants::CODE];
+		
+		if(array_key_exists(APIConstants::ACTION,$entityResponseJSON))
+		{
+			$this->upsertDetails[APIConstants::ACTION]=$entityResponseJSON[APIConstants::ACTION];
+		}
+		if(array_key_exists(APIConstants::DUPLICATE_FIELD,$entityResponseJSON))
+		{
+			$this->upsertDetails[APIConstants::DUPLICATE_FIELD]=$entityResponseJSON[APIConstants::DUPLICATE_FIELD];
+		}
 	}
 
     /**
@@ -90,6 +100,13 @@ class EntityResponse
      */
     public function setData($data){
         $this->data = $data;
+    }
+    /*
+     * Returns upsert details like action,duplicate_field
+     */
+    public function getUpsertDetails()
+    {
+    	return $this->upsertDetails;
     }
 
 }

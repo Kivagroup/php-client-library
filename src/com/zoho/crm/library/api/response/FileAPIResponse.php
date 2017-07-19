@@ -11,6 +11,7 @@ class FileAPIResponse
 	private $code=null;
 	private $message=null;
 	private $details=null;
+	private $status=null;
 	
 	public function setFileContent($httpResponse,$httpStatusCode)
 	{
@@ -47,6 +48,7 @@ class FileAPIResponse
 		{
 			$this->response=$content;
 			$this->responseJSON=array();
+			$this->status=APIConstants::CODE_SUCCESS;
 		}
 		$this->responseHeaders=$headerMap;
 		return $this;
@@ -176,6 +178,11 @@ class FileAPIResponse
      */
     public function setDetails($details){
         $this->details = $details;
+    }
+    
+    public function getStatus()
+    {
+    	return $this->status;
     }
 
 }

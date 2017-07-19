@@ -63,20 +63,6 @@ class CommonAPIResponse
 				$headerMap[$splitArray[0]]=$splitArray[1];
 			}
 		}
-		/*if(self::getAPIName()==null || $this->httpStatusCode==APIConstants::RESPONSECODE_AUTHORIZATION_ERROR || $this->httpStatusCode==APIConstants::RESPONSECODE_BAD_REQUEST)
-		{
-			$jsonResponse=json_decode($content,true);
-			if($jsonResponse==null && $this->httpStatusCode!=APIConstants::RESPONSECODE_NO_CONTENT)
-			{
-				list($headers, $content) = explode("\r\n\r\n",$content,2);
-				$jsonResponse=json_decode($content,true);
-			}
-			$this->responseJSON=$jsonResponse;
-		}
-		else if(self::getAPIName()=="downloadFile")
-		{
-			$this->response=$content;
-		}*/
 		$jsonResponse=json_decode($content,true);
 		if($jsonResponse==null && $this->httpStatusCode!=APIConstants::RESPONSECODE_NO_CONTENT)
 		{

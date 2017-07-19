@@ -62,5 +62,7 @@ class APIConstants
 	const DOWNLOAD_FILE_PATH="../../../../../../resources";
 	
 	const USER_EMAIL_ID="user_email_id";
+	const ACTION="action";
+	const DUPLICATE_FIELD="duplicate_field";
 }
 ?>

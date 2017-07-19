@@ -25,6 +25,7 @@ class ZCRMRecord
 	private $participants = array();
 	private $priceDetails = array();
 	private $layout=null;
+	private $taxList=array();
 	
 	private function __construct($module,$entityId)
 	{
@@ -37,6 +38,16 @@ class ZCRMRecord
 		return new ZCRMRecord($module,$entityId);
 	}
 
+	
+	public function addTax($taxIns)
+	{
+		array_push($this->taxList,$taxIns);
+	}
+	
+	public function getTaxList()
+	{
+		return $this->taxList;
+	}
     /**
      * entityId
      * @return Long
