@@ -18,7 +18,6 @@ class Main
 	{
 		try{
 			ZCRMRestClient::initialize();
-			
 			/*$oAuthCli = ZohoOAuth::getClientInstance();
 			$grantToken = "1000.8d21e64ba6f9834c7abeaa19e11651bc.9ec9e6a4f9e686169d3d20e19343010a";
 			$oAuthTokens = $oAuthCli->generateAccessToken($grantToken);

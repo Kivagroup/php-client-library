@@ -296,7 +296,6 @@ class OrganizationAPIHandlerTest
 			{
 				if($userData->getId()==null || $userData->getEmail()!=$zcrmUser->getEmail())
 				{
-					var_dump($userData);
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMOrganization','createUsers','Invalid response','Invalid response for duplicate user creation'.$responseIns->getMessage(),'failure',($endTime-$startTime));
 					return;
 				}
@@ -305,6 +304,11 @@ class OrganizationAPIHandlerTest
 		}catch (ZCRMException $e)
 		{
 			$endTime=$endTime==0?microtime(true)*1000:$endTime;
+			if("Failed to add user since same email id is already present"==$e->getMessage())
+			{
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMOrganization','createUsers',null,null,'success',($endTime-$startTime));
+				return;
+			}
 			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMOrganization','createUsers',$e->getMessage(),$e->getExceptionDetails(),'failure',($endTime-$startTime));
 		}
 	}

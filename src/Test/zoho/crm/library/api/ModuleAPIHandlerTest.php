@@ -80,6 +80,7 @@ class ModuleAPIHandlerTest
 		foreach (self::$moduleVsFieldIdMap as $moduleApiName=>$fieldList)
 		{
 			$moduleIns=ZCRMModule::getInstance($moduleApiName);
+			$moduleName=MetaDataAPIHandlerTest::$moduleList[$moduleApiName];
 			foreach ($fieldList as $field)
 			{
 				$startTime=microtime(true)*1000;
@@ -95,23 +96,25 @@ class ModuleAPIHandlerTest
 						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getFieldDetails('.$field.'),'.$moduleApiName,'Invalid Response','Invalid field response received','failure',($endTime-$startTime));
 						continue;
 					}
-					$dataType=$zcrmField->getDataType();
-					if($dataType=='lookup' && $zcrmField->getLookupField()==null)
+					if(!TestUtil::isActivityModule($moduleName) && $moduleName!='Activities' && $moduleName!='Attachments')
 					{
-						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getFieldDetails('.$field.'),'.$moduleApiName,'Invalid Response','Lookup field data is not fetched','failure',($endTime-$startTime));
-						continue;
+						$dataType=$zcrmField->getDataType();
+						if($dataType=='lookup' && $zcrmField->getLookupField()==null)
+						{
+							Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getFieldDetails('.$field.'),'.$moduleApiName,'Invalid Response','Lookup field data is not fetched','failure',($endTime-$startTime));
+							continue;
+						}
+						else if($dataType=='picklist' && $zcrmField->getPickListFieldValues()==null)
+						{
+							Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getFieldDetails('.$field.'),'.$moduleApiName,'Invalid Response','PickList field values not fetched','failure',($endTime-$startTime));
+							continue;
+						}
+						else if($dataType=='currency' && ($zcrmField->getPrecision()==null || $zcrmField->getDecimalPlace()==null || $zcrmField->getRoundingOption()==null))
+						{
+							Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getFieldDetails('.$field.'),'.$moduleApiName,'Invalid Response','Currency field data not fetched','failure',($endTime-$startTime));
+							continue;
+						}
 					}
-					else if($dataType=='picklist' && $zcrmField->getPickListFieldValues()==null)
-					{
-						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getFieldDetails('.$field.'),'.$moduleApiName,'Invalid Response','PickList field values not fetched','failure',($endTime-$startTime));
-						continue;
-					}
-					else if($dataType=='currency' && ($zcrmField->getPrecision()==null || $zcrmField->getDecimalPlace()==null || $zcrmField->getRoundingOption()==null))
-					{
-						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getFieldDetails('.$field.'),'.$moduleApiName,'Invalid Response','Currency field data not fetched','failure',($endTime-$startTime));
-						continue;
-					}
-						
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule','getFieldDetails('.$field.'),'.$moduleApiName,null,null,'success',($endTime-$startTime));
 				}
 				catch (ZCRMException $e)
@@ -287,7 +290,7 @@ class ModuleAPIHandlerTest
 					}
 					if($zcrmCustomView->getFields()!=null && sizeof($zcrmCustomView->getFields())!=0)
 					{
-						if($moduleName=='Contacts')
+						if($moduleName=='Contacts' || $moduleName=='Leads')
 						{
 							self::$customViewVsFieldMap[$customViewId]=$zcrmCustomView->getFields()[1];
 						}

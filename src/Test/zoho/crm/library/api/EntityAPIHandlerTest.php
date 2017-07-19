@@ -31,12 +31,13 @@ class EntityAPIHandlerTest
 		try{
 			Main::incrementTotalCount();
 			$parentRecord=ZCRMRecord::getInstance("Products", $productId);
-			$junctionRecord=ZCRMJunctionRecord::getInstance("Products", $priceBookId);
+			$junctionRecord=ZCRMJunctionRecord::getInstance("Price_Books", $priceBookId);
+			$junctionRecord->setRelatedData("list_price", 98);
 			$responseIns=$parentRecord->addRelation($junctionRecord);
 			$endTime=microtime(true)*1000;
-			if($responseIns->getHttpStatus!=APIConstants::RESPONSECODE_OK || "relation added"!=$responseIns->getMessage())
+			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || "relation added"!=$responseIns->getMessage())
 			{
-				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'addRelation(Price_Books,'.$priceBookId.")",$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'addRelation(Price_Books,'.$priceBookId.")",$responseIns->getMessage(),$responseIns->getHttpStatusCode(),'failure',($endTime-$startTime));
 				return;
 			}
 			
@@ -57,12 +58,12 @@ class EntityAPIHandlerTest
 		try{
 			Main::incrementTotalCount();
 			$parentRecord=ZCRMRecord::getInstance("Products", $productId);
-			$junctionRecord=ZCRMJunctionRecord::getInstance("Products", $priceBookId);
+			$junctionRecord=ZCRMJunctionRecord::getInstance("Price_Books", $priceBookId);
 			$responseIns=$parentRecord->removeRelation($junctionRecord);
 			$endTime=microtime(true)*1000;
-			if($responseIns->getHttpStatus!=APIConstants::RESPONSECODE_OK || "relation removed"!=$responseIns->getMessage())
+			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || "relation removed"!=$responseIns->getMessage())
 			{
-				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'removeRelation(Price_Books,'.$priceBookId.")",$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'removeRelation(Price_Books,'.$priceBookId.")",$responseIns->getMessage(),$responseIns->getHttpStatusCode(),'failure',($endTime-$startTime));
 				return;
 			}
 				
