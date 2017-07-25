@@ -19,7 +19,7 @@ class Main
 		try{
 			ZCRMRestClient::initialize();
 			/*$oAuthCli = ZohoOAuth::getClientInstance();
-			$grantToken = "1000.8d21e64ba6f9834c7abeaa19e11651bc.9ec9e6a4f9e686169d3d20e19343010a";
+			$grantToken = "1000.70cbe4464e88ab5d1a5f928cb12b8996.81bb214c919482ec3467a344274236c5";
 			$oAuthTokens = $oAuthCli->generateAccessToken($grantToken);
 			$accessToken = $oAuthTokens->getAccessToken();
 			$refreshToken=$oAuthTokens->getRefreshToken();
@@ -30,10 +30,10 @@ class Main
 			$header="<html><head>Report</head><body><h1><center><b><i> PHP Client Library Test Report</i></b></center></h1><hr><br><table border=\"1\" width=\"100%\" cellspacing=\"2\" cellpadding=\"10\"><tr bgcolor=\"B7B2B2\"><td><b><center>SL no.</center></b></td><td><b><center>Class Name</center></b></td><td><b><center>Method Name</center></b></td><td><b><center>Message</center></b></td><td><b><center>Exception</center></b></td><td><b><center>Status</center></b></td><td><b><center>Time Taken(in milliseconds)</center></b></td></tr>";
 			fwrite($fp, $header);
 			OrganizationAPIHandlerTest::test($fp);
-			MetaDataAPIHandlerTest::test($fp);
-			ModuleAPIHandlerTest::test($fp);
-			EntityAPIHandlerTest::test($fp);
-			MassEntityAPIHandlerTest::test($fp);
+			//MetaDataAPIHandlerTest::test($fp);
+			//ModuleAPIHandlerTest::test($fp);
+			//EntityAPIHandlerTest::test($fp);
+			//MassEntityAPIHandlerTest::test($fp);
 			
 			$endTime=microtime(true)*1000;
 			$duration=$endTime-$startTime;
@@ -44,7 +44,7 @@ class Main
 			fwrite($fp, Helper::TROPEN.'<td colspan="2"><font color="green"><h2>Success Count</h1></font>'.Helper::TDCLOSE.'<td colspan="6"><h2><font color="green">'.self::$successCount.Helper::TDTRCLOSE);
 			fwrite($fp, Helper::TROPEN.'<td colspan="2"><font color="grey"><h2>Run Duration (in min)</h1></font>'.Helper::TDCLOSE.'<td colspan="6"><h2>'.($duration/60).Helper::TDTRCLOSE);
 			fclose($fp);
-				
+			self::sendMail($fileName);
 		}
 		catch (Exception $e)
 		{
@@ -60,6 +60,92 @@ class Main
 	public static function getCurrentCount()
 	{
 		return self::$totalCallsCount;
+	}
+	
+	public function sendMail($file)
+	{
+		$message="Please verify the Automation Report!!";
+		$fileContent = file_get_contents($file);
+		$fileContent = chunk_split(base64_encode($fileContent));
+		
+		// a random hash will be necessary to send mixed content
+		$separator = md5(time());
+		
+		// carriage return type (RFC)
+		$eol = "\r\n";
+		
+		// main header (multipart mandatory)
+		$headers = "From: PHP Automation <sumanth.chilka@zohocorp.com>" . $eol;
+		$headers .= "MIME-Version: 1.0" . $eol;
+		$headers .= "Content-Type: multipart/mixed; boundary=\"" . $separator . "\"" . $eol;
+		$headers .= "Content-Transfer-Encoding: 7bit" . $eol;
+		$headers .= "This is a MIME encoded message." . $eol;
+		
+		// message
+		$body = "--" . $separator . $eol;
+		$body .= "Content-Type: text/plain; charset=\"iso-8859-1\"" . $eol;
+		$body .= "Content-Transfer-Encoding: 8bit" . $eol;
+		$body .= $message . $eol;
+		
+		// attachment
+		$body .= "--" . $separator . $eol;
+		$body .= "Content-Type: application/octet-stream; name=\"" . $file . "\"" . $eol;
+		$body .= "Content-Transfer-Encoding: base64" . $eol;
+		$body .= "Content-Disposition: attachment" . $eol;
+		$body .= $fileContent . $eol;
+		$body .= "--" . $separator . "--";
+		
+		$mailTo="sumanth.chilka@zohocorp.com";
+		$subject="PHP Client Library Automation Report";
+		//SEND Mail
+		if (mail($mailTo, $subject, $body, $headers)) {
+			echo "Mail sent ... OK";
+		} else {
+			echo "Mail send ... ERROR!";
+			print_r( error_get_last() );
+		}
+		
+	}
+	
+	public function sendMailWithAuthentication($file)
+	{
+		$from = "PHP Automation <sumanth.chilka@zohocorp.com>";
+		$to = "Sumanth <sumanth.chilka@zohocorp.com>";
+		$subject = "Automation Report!";
+		
+		$headers = array ('From' => $from,'To' => $to, 'Subject' => $subject);
+		
+		// text and html versions of email.
+		$text="Sample Text";
+		$html = "Please verify Automation Report";
+		
+		// attachment
+		//$file = '/catpictures/cat.jpg';
+		$crlf = "n";
+		
+		$mime = new Mail_mime($crlf);
+		$mime->setTXTBody($text);
+		$mime->setHTMLBody($html);
+		$mime->addAttachment($file, 'text/plain');
+		
+		$body = $mime->get();
+		$headers = $mime->headers($headers);
+		
+		$host = "smtp.zohocorp.com";
+		$username = "sumanth-3058";
+		$password = "mac5@ZOHO";
+		
+		$smtp = Mail::factory('smtp', array ('host' => $host, 'auth' => true,
+				'username' => $username,'password' => $password));
+		
+		$mail = $smtp->send($to, $headers, $body);
+		
+		if (PEAR::isError($mail)) {
+			echo("<p>" . $mail->getMessage() . "</p>");
+		}
+		else {
+			echo("<p>Message successfully sent!</p>");
+		}
 	}
 	
 }
