@@ -35,7 +35,7 @@ class EntityAPIHandlerTest
 			$junctionRecord->setRelatedData("list_price", 98);
 			$responseIns=$parentRecord->addRelation($junctionRecord);
 			$endTime=microtime(true)*1000;
-			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || "relation added"!=$responseIns->getMessage())
+			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || "relation added"!=$responseIns->getMessage() || $responseIns->getCode()!=APIConstants::CODE_SUCCESS || $responseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $responseIns->getDetails()['id']!=$junctionRecord->getId())
 			{
 				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'addRelation(Price_Books,'.$priceBookId.")",$responseIns->getMessage(),$responseIns->getHttpStatusCode(),'failure',($endTime-$startTime));
 				return;
@@ -61,7 +61,7 @@ class EntityAPIHandlerTest
 			$junctionRecord=ZCRMJunctionRecord::getInstance("Price_Books", $priceBookId);
 			$responseIns=$parentRecord->removeRelation($junctionRecord);
 			$endTime=microtime(true)*1000;
-			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || "relation removed"!=$responseIns->getMessage())
+			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || "relation removed"!=$responseIns->getMessage() || $responseIns->getCode()!=APIConstants::CODE_SUCCESS || $responseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $responseIns->getDetails()['id']!=$junctionRecord->getId())
 			{
 				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRecord(Products,'.$productId.")",'removeRelation(Price_Books,'.$priceBookId.")",$responseIns->getMessage(),$responseIns->getHttpStatusCode(),'failure',($endTime-$startTime));
 				return;
@@ -247,7 +247,7 @@ class EntityAPIHandlerTest
 			$recordIns=ZCRMRecord::getInstance($moduleAPIName, self::$moduleApiNameVsEntityId[$moduleAPIName]);
 			$responseIns=$recordIns->delete();
 			$endTime=microtime(true)*1000;
-			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $responseIns->getMessage()!='record deleted')
+			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $responseIns->getMessage()!='record deleted' || $responseIns->getCode()!=APIConstants::CODE_SUCCESS || $responseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $responseIns->getDetails()['id']!=$recordIns->getEntityId())
 			{
 				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'validateDeleteRecordResponse',"Record deletion failed,id=".$recordIns->getEntityId(),$responseIns->getCode(),'failure',($endTime-$startTime));
 				return false;
@@ -274,9 +274,9 @@ class EntityAPIHandlerTest
 			$responseIns=$moduleIns->getRecord(self::$moduleApiNameVsEntityId[$moduleAPIName]);
 			$endTime=microtime(true)*1000;
 			$zcrmRecord=$responseIns->getData();
-			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $zcrmRecord==null || $zcrmRecord->getData()==null || $zcrmRecord->getCreatedBy()==null)
+			if($responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $zcrmRecord==null || $zcrmRecord->getData()==null || $zcrmRecord->getCreatedBy()==null || $zcrmRecord->getOwner()==null || $zcrmRecord->getCreatedTime()==null)
 			{
-				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'validateGetRecordResponse',"Record Get failed",$responseIns->getMessage(),'failure',($endTime-$startTime));
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName."),".self::$moduleApiNameVsEntityId[$moduleAPIName],'validateGetRecordResponse',"Record Get failed",$responseIns->getMessage(),'failure',($endTime-$startTime));
 				return false;
 			}
 			return true;
@@ -284,7 +284,7 @@ class EntityAPIHandlerTest
 		catch (ZCRMException $e)
 		{
 			$endTime=$endTime==0?microtime(true)*1000:$endTime;
-			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'validateGetRecordResponse',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName."),".self::$moduleApiNameVsEntityId[$moduleAPIName],'validateGetRecordResponse',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
 			return false;
 		}
 	}
@@ -312,6 +312,7 @@ class EntityAPIHandlerTest
 				{
 					$endTime=$endTime==0?microtime(true)*1000:$endTime;
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'updateRecordFieldsAndValidate',"Unable to process","Record creation failed so update can't be done",'failure',($endTime-$startTime));
+					continue;
 				}
 				$zcrmrecord=ZCRMRecord::getInstance($moduleAPIName, self::$moduleApiNameVsEntityId[$moduleAPIName]);
 				$layoutFields=MetaDataAPIHandlerTest::$moduleVsLayoutMap[$moduleAPIName][$layoutId];
@@ -425,7 +426,7 @@ class EntityAPIHandlerTest
 		catch (ZCRMException $e)
 		{
 			$endTime=$endTime==0?microtime(true)*1000:$endTime;
-			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'updateRecordFields',$e->getMessage().",id=".self::$moduleApiNameVsEntityId[$moduleAPIName],$e->getTraceAsString(),'failure',($endTime-$startTime));
+			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'updateRecordFieldsAndValidate',$e->getMessage().",id=".self::$moduleApiNameVsEntityId[$moduleAPIName],$e->getTraceAsString(),'failure',($endTime-$startTime));
 		}
 	}
 	
@@ -435,7 +436,7 @@ class EntityAPIHandlerTest
 			$responseIns=$zcrmrecord->update();
 			$endTime=microtime(true)*1000;
 			$responseRecord=$responseIns->getData();
-			if($responseRecord->getEntityId()==null || $responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $responseIns->getMessage()!='record updated')
+			if($responseRecord->getEntityId()==null || $responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $responseIns->getMessage()!='record updated' || $responseIns->getCode()!=APIConstants::CODE_SUCCESS || $responseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $responseIns->getDetails()['id']!=$zcrmrecord->getEntityId())
 			{
 				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'validateUpdateResponse',"Record update failed",$responseIns->getMessage(),'failure',($endTime-$startTime));
 				return false;
@@ -593,7 +594,7 @@ class EntityAPIHandlerTest
 			$responseIns=$zcrmrecord->create();
 			$endTime=microtime(true)*1000;
 			$responseRecord=$responseIns->getData();
-			if($responseRecord->getEntityId()==null || $responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_CREATED)
+			if($responseRecord->getEntityId()==null || $responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_CREATED || $responseIns->getCode()!=APIConstants::CODE_SUCCESS || $responseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $responseIns->getDetails()['id']==null)
 			{
 				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'validateCreateResponse',"Record Creation Failed",$responseIns->getMessage(),'failure',($endTime-$startTime));
 				return false;
@@ -610,12 +611,13 @@ class EntityAPIHandlerTest
 			
 			self::$moduleApiNameVsEntityId[$moduleAPIName]=$responseRecord->getEntityId();
 			
-			/*
-			$moduleName=MetaDataAPIHandlerTest::$moduleList[$moduleAPIName];
+			
+			/*$moduleName=MetaDataAPIHandlerTest::$moduleList[$moduleAPIName];
 			if($moduleName=='Leads' || $moduleName=='Accounts' || $moduleName=='Quotes' || $moduleName=='SalesOrders'||$moduleName=='PurchaseOrders' || $moduleName=='Invoices')
 			{
 				return true;
 			}
+			
 			$zcrmModule=ZCRMModule::getInstance($moduleAPIName);
 			$responseIns=$zcrmModule->getRecord($responseRecord->getEntityId());
 			$getRecord=$responseIns->getData();
@@ -632,6 +634,7 @@ class EntityAPIHandlerTest
 				}
 			}
 			*/
+			
 			return true;
 			
 		}

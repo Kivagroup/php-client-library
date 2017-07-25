@@ -25,8 +25,8 @@ class APIConstantsTest extends \PHPUnit_Framework_TestCase
         $this->instance->assertEqualsCheck('The given id seems to be invalid.',APIConstants::INVALID_ID_MSG);
         $this->instance->assertEqualsCheck('Cannot process more than 100 records at a time.',APIConstants::API_MAX_RECORDS_MSG);
         $this->instance->assertEqualsCheck('INVALID_DATA',APIConstants::INVALID_DATA);
-        $this->instance->assertEqualsCheck('error',APIConstants::CODE_ERROR);
-        $this->instance->assertEqualsCheck('success',APIConstants::CODE_SUCCESS);
+        $this->instance->assertEqualsCheck('error',APIConstants::STATUS_ERROR);
+        $this->instance->assertEqualsCheck('success',APIConstants::STATUS_SUCCESS);
         $this->instance->assertEqualsCheck('Leads',APIConstants::LEADS);
         $this->instance->assertEqualsCheck('Accounts',APIConstants::ACCOUNTS);
         $this->instance->assertEqualsCheck('Contacts',APIConstants::CONTACTS);

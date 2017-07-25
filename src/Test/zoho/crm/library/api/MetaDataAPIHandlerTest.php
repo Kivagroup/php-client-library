@@ -35,9 +35,27 @@ class MetaDataAPIHandlerTest
 			}
 			foreach ($moduleArr as $module)
 			{
-				if($module->getId()==null || $module->getModuleName()==null || $module->getAPIName()==null ||$module->getSingularLabel()==null ||$module->getPluralLabel()==null)
+				if($module->getId()==null || $module->getModuleName()==null || $module->getAPIName()==null ||$module->getSingularLabel()==null ||$module->getPluralLabel()==null || !is_bool($module->isCustomModule()) || !is_bool($module->isCreatable()) || !is_bool($module->isConvertable()) || !is_bool($module->isEditable()) || !is_bool($module->isDeletable()) || !is_bool($module->isViewable()) || !is_bool($module->isApiSupported()) || !is_bool($module->isScoringSupported()) || !is_integer($module->getBusinessCardFieldLimit()) || !is_integer($module->getBusinessCardFieldLimit()) || !is_bool($module->isGlobalSearchSupported()) ||  !is_integer($module->getSequenceNumber()))
 				{
 					throw new ZCRMException("Some fields data is not fetched");
+				}
+				else if($module->getModuleName()!='Feeds')
+				{
+					if(sizeof($module->getAllProfiles())==0)
+					{
+						throw new ZCRMException("Profiles not set in the module object");
+					}
+					else
+					{
+						$profiles=$module->getAllProfiles();
+						foreach ($profiles as $profile)
+						{
+							if($profile->getId()==null || $profile->getName()==null)
+							{
+								throw new ZCRMException("Profile Data is not set properly in the module object");
+							}
+						}
+					}
 				}
 				if($module->isApiSupported())
 				{
@@ -66,6 +84,10 @@ class MetaDataAPIHandlerTest
 		foreach(self::$moduleList as $apiName=>$moduleName)
 		{
 			try{
+				if($moduleName=='Feeds' || $moduleName=='Home')
+				{
+					continue;
+				}
 				self::setCurrentModule($apiName);
 				Main::incrementTotalCount();
 				$startTime=microtime(true)*1000;
@@ -76,17 +98,62 @@ class MetaDataAPIHandlerTest
 				$endTime=microtime(true)*1000;
 				if($moduleResponse==null || $moduleResponse->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK || $zcrmModule==null)
 				{
-					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule','Invalid Response','Response status code is not as expected('.$moduleResponse->getHttpStatusCode().')','failure',($endTime-$startTime));
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Response status code is not as expected('.$moduleResponse->getHttpStatusCode().')','failure',($endTime-$startTime));
 					continue;
 				}
+				if($zcrmModule->getId()==null || $zcrmModule->getModuleName()==null || $zcrmModule->getAPIName()==null ||$zcrmModule->getSingularLabel()==null ||$zcrmModule->getPluralLabel()==null || !is_bool($zcrmModule->isCustomModule()) || !is_bool($zcrmModule->isCreatable()) || !is_bool($zcrmModule->isConvertable()) || !is_bool($zcrmModule->isEditable()) || !is_bool($zcrmModule->isDeletable()) || !is_bool($zcrmModule->isViewable()) || !is_bool($zcrmModule->isApiSupported()) || !is_bool($zcrmModule->isScoringSupported()) || !is_integer($zcrmModule->getBusinessCardFieldLimit()) || !is_integer($zcrmModule->getBusinessCardFieldLimit()) || !is_bool($zcrmModule->isGlobalSearchSupported()) ||  !is_integer($zcrmModule->getSequenceNumber()))
+				{
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module fields data not fetched properly','failure',($endTime-$startTime));
+					continue;
+				}
+				if($zcrmModule->getRelatedLists()!=null)
+				{
+					$relatedLists=$zcrmModule->getRelatedLists();
+					foreach ($relatedLists as $relatedList)
+					{
+						if($relatedList->getApiName()==null || $relatedList->getDisplayLabel()==null || $relatedList->getId()==null|| $relatedList->getType()==null || !is_bool($relatedList->isVisible()))
+						{
+							Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module Related List details not fetched properly','failure',($endTime-$startTime));
+							break;
+						}
+					}
+				}
+				$accessibleProfiles=$zcrmModule->getAllProfiles();
+				foreach ($accessibleProfiles as $profile)
+				{
+					if($profile->getName()==null || $profile->getId()==null)
+					{
+						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module accessible profiles data not fetched properly','failure',($endTime-$startTime));
+						break;
+					}
+				}
+				
+				if(!is_array($zcrmModule->getProperties()))
+				{
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module properties not fetched properly','failure',($endTime-$startTime));
+					continue;
+				}
+				
+				if(!is_array($zcrmModule->getBusinessCardFields()) || ($zcrmModule->getBusinessCardFieldLimit()>0 && sizeof($zcrmModule->getBusinessCardFields())<1))
+				{
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module Business card fields not fetched properly','failure',($endTime-$startTime));
+					continue;
+				}
+				
 				if(!$zcrmModule->isCreatable())
 				{
 					continue;
 				}
+				
 				$rawFieldArray=$zcrmModule->getFields();
 				$fieldArray=array();
 				foreach ($rawFieldArray as $field)
 				{
+					if(!is_bool($field->isCustomField()) || !is_bool($field->isVisible()) || !is_bool($field->isReadOnly()) || !is_bool($field->isBusinessCardSupported()) || !is_string($field->getFieldLabel()) || !is_long($field->getId()) || !is_string($field->getApiName()) || !is_integer($field->getLength()) || !is_string($field->getCreatedSource()) || !is_string($field->getDataType()) || ($moduleName!='Events' && $field->getJsonType()==null))
+					{
+						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module Field details not fetched properly','failure',($endTime-$startTime));
+						break;
+					}
 					$fieldDetails=array();
 					$dataType=$field->getDataType();
 					$fieldPermissions=$field->getFieldLayoutPermissions();
@@ -120,6 +187,42 @@ class MetaDataAPIHandlerTest
 					$layoutVsFields=array();
 					foreach ($layouts as $layout)
 					{
+						if(!is_string($layout->getName())|| !is_long($layout->getId()) || !is_integer($layout->getStatus()) || !is_bool($layout->isVisible()))
+						{
+							Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module Layout details not fetched properly','failure',($endTime-$startTime));
+							break;
+						}
+						$layoutProfiles=$layout->getAccessibleProfiles();
+						foreach ($layoutProfiles as $profile)
+						{
+							if(!is_string($profile->getName()) || !is_long($profile->getId()))
+							{
+								Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module layout accessible profiles data not fetched properly','failure',($endTime-$startTime));
+								break;
+							}
+						}
+						$convertMapping=$layout->getConvertMapping();
+						if(sizeof($convertMapping)>0)
+						{
+							$accMapIns=$convertMapping[APIConstants::ACCOUNTS];
+							$dealMapIns=$convertMapping[APIConstants::DEALS];
+							$conMapIns=$convertMapping[APIConstants::CONTACTS];
+							if(!is_string($accMapIns->getName()) || !is_long($accMapIns->getId()))
+							{
+								Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Lead convert mapping for Accounts not fetched properly','failure',($endTime-$startTime));
+								break;
+							}
+							else if(!is_string($dealMapIns->getName()) || !is_long($dealMapIns->getId()))
+							{
+								Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Lead convert mapping for Deals not fetched properly','failure',($endTime-$startTime));
+								break;
+							}
+							else if(!is_string($conMapIns->getName()) || !is_long($conMapIns->getId()))
+							{
+								Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Lead convert mapping for Contacts not fetched properly','failure',($endTime-$startTime));
+								break;
+							}
+						}
 						$sections=$layout->getSections();
 						if($sections==null)
 						{
@@ -128,6 +231,12 @@ class MetaDataAPIHandlerTest
 						$layoutFieldArray=array();
 						foreach ($sections as $section)
 						{
+							if(!is_string($section->getName()) || !is_integer($section->getColumnCount()) || !is_integer($section->getSequenceNumber()) || !is_string($section->getDisplayName()))
+							{
+								Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module layout section data not fetched properly','failure',($endTime-$startTime));
+								break;
+							}
+							
 							$fields=$section->getFields();
 							if($fields==null)
 							{
@@ -135,6 +244,11 @@ class MetaDataAPIHandlerTest
 							}
 							foreach ($fields as $field)
 							{
+								if(!is_string($field->getApiName()) || !is_long($field->getId()) || !is_integer($field->getSequenceNumber()) || !is_bool($field->isMandatory()))
+								{
+									Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMRestClient','getModule('.$moduleName.')','Invalid Response','Module layout section fields data not fetched properly','failure',($endTime-$startTime));
+									break;
+								}
 								array_push($layoutFieldArray, $field->getApiName());
 							}
 						}

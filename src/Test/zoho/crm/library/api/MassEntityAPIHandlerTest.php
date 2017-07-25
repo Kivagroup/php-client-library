@@ -229,9 +229,9 @@ class MassEntityAPIHandlerTest
 	public function validateGetDeletedRecordsResponse($apiName,$startTime,$endTime)
 	{
 		$types=array("all","recycle","permanent");
-		try {
-			foreach ($types as $type)
-			{
+		foreach ($types as $type)
+		{
+			try {
 				Main::incrementTotalCount();
 				$startTime=microtime(true)*1000;
 				$moduleIns=ZCRMModule::getInstance($apiName);
@@ -256,21 +256,35 @@ class MassEntityAPIHandlerTest
 				if($bulkResponseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_OK && $bulkResponseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_NO_CONTENT)
 				{
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.")",'validateGetDeletedRecordsResponse',"Deleted Records GET Failed",$bulkResponseIns->getMessage(),'failure',($endTime-$startTime));
-					return;
+					continue;
 				}
 				$deletedIdList=array();
 				foreach ($trashRecords as $trashRecord)
 				{
+					if($trashRecord->getEntityId()==null || $trashRecord->getType()==null || $trashRecord->getDeletedTime()==null)
+					{
+						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.")",'validateGetDeletedRecordsResponse',"Trash Record data is not set properly","id=".$trashRecord->getEntityId().",type=".$trashRecord->getType().",deleted_time=".$trashRecord->getDeletedTime(),'failure',($endTime-$startTime));
+						continue;
+					}
+					if($type!='all' && $type!=$trashRecord->getType())
+					{
+						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.")",'validateGetDeletedRecordsResponse',"Trash Record Type mismatched","requested_type=".$type.",fetched_type=".$trashRecord->getType(),'failure',($endTime-$startTime));
+						continue;
+					}
 					array_push($deletedIdList,$trashRecord->getEntityId());
 				}
 				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$apiName.")",$methodName,"Deleted Records fetched successfully","ID List:".json_encode($deletedIdList),'success',($endTime-$startTime));
 				unset($deletedIdList);
+			}catch (ZCRMException $e)
+			{
+				$endTime=$endTime==0?microtime(true)*1000:$endTime;
+				if($e->getCode()==APIConstants::RESPONSECODE_NO_CONTENT && $e->getMessage()=='No Content')
+				{
+					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'ZCRMModule('.$apiName.")",$methodName,"Deleted Records fetched successfully","No Records Exist",'success',($endTime-$startTime));
+					continue;
+				}
+				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.")",'validateGetDeletedRecordsResponse',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
 			}
-		}
-		catch (ZCRMException $e)
-		{
-			$endTime=$endTime==0?microtime(true)*1000:$endTime;
-			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$apiName.")",'validateGetDeletedRecordsResponse',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
 		}
 	}
 	
@@ -295,7 +309,7 @@ class MassEntityAPIHandlerTest
 			$deletedIdList=array();
 			foreach ($entityResponses as $entityResponseIns)
 			{
-				if(!(APIConstants::CODE_SUCCESS==$entityResponseIns->getStatus() && "record deleted"==$entityResponseIns->getMessage()) && "record not deletable"!=$entityResponseIns->getMessage())
+				if(!(APIConstants::STATUS_SUCCESS==$entityResponseIns->getStatus() && "record deleted"==$entityResponseIns->getMessage() && $entityResponseIns->getCode()==APIConstants::CODE_SUCCESS && $entityResponseIns->getStatus()==APIConstants::STATUS_SUCCESS && $entityResponseIns->getDetails()['id']!=null) && "record not deletable"!=$entityResponseIns->getMessage())
 				{
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateDeleteRecordsResponse',"Record deletion Failed2",json_encode($entityResponseIns->getResponseJSON()),'failure',($endTime-$startTime));
 				}
@@ -342,6 +356,14 @@ class MassEntityAPIHandlerTest
 				{
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateGetRecordsResponse',"Record Get failed","Insert and Get records count mismatched;;insertCount=".$insertCount.",getCount=".$getCount,'failure',($endTime-$startTime));
 					return;
+				}
+				foreach ($records as $zcrmRecord)
+				{
+					if($zcrmRecord->getData()==null || $zcrmRecord->getCreatedBy()==null || $zcrmRecord->getOwner()==null || $zcrmRecord->getCreatedTime()==null)
+					{
+						Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateGetRecordsResponse',"Record Get failed","Records data is not fetched properly",'failure',($endTime-$startTime));
+						return;
+					}
 				}
 				$fetchCount=$getCount;
 			}
@@ -412,7 +434,7 @@ class MassEntityAPIHandlerTest
 			$entityResponses=$bulkResponseIns->getEntityResponses();
 			foreach ($entityResponses as $entityResponseIns)
 			{
-				if(APIConstants::CODE_SUCCESS!=$entityResponseIns->getStatus() || "record updated"!=$entityResponseIns->getMessage())
+				if(APIConstants::STATUS_SUCCESS!=$entityResponseIns->getStatus() || "record updated"!=$entityResponseIns->getMessage() || $entityResponseIns->getCode()!=APIConstants::CODE_SUCCESS || $entityResponseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $entityResponseIns->getDetails()['id']==null)
 				{
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateUpdateResponse',"Record update Failed",json_encode($entityResponseIns->getResponseJSON()),'failure',($endTime-$startTime));
 				}
@@ -603,7 +625,7 @@ class MassEntityAPIHandlerTest
 			$creationSuccess=true;
 			foreach ($entityResponses as $entityResponseIns)
 			{
-				if(APIConstants::CODE_SUCCESS!=$entityResponseIns->getStatus() || "record added"!=$entityResponseIns->getMessage())
+				if(APIConstants::STATUS_SUCCESS!=$entityResponseIns->getStatus() || "record added"!=$entityResponseIns->getMessage() || $entityResponseIns->getCode()!=APIConstants::CODE_SUCCESS || $entityResponseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $entityResponseIns->getDetails()['id']==null)
 				{
 					$creationSuccess=false;
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateCreateResponse',"Record Creation Failed",json_encode($entityResponseIns->getResponseJSON()),'failure',($endTime-$startTime));
@@ -641,7 +663,7 @@ class MassEntityAPIHandlerTest
 			$entityResponses=$bulkResponseIns->getEntityResponses();
 			foreach ($entityResponses as $entityResponseIns)
 			{
-				if(APIConstants::CODE_SUCCESS!=$entityResponseIns->getStatus() || ("record added"!=$entityResponseIns->getMessage() && "record updated"!=$entityResponseIns->getMessage()))
+				if(APIConstants::STATUS_SUCCESS!=$entityResponseIns->getStatus() || ("record added"!=$entityResponseIns->getMessage() && "record updated"!=$entityResponseIns->getMessage()) || $entityResponseIns->getCode()!=APIConstants::CODE_SUCCESS || $entityResponseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $entityResponseIns->getDetails()['id']==null)
 				{
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'MassEntityAPIHandlerTest('.$moduleAPIName.")",'validateUpsertResponse',"Record Upsert Failed1",json_encode($entityResponseIns->getResponseJSON()),'failure',($endTime-$startTime));
 					continue;
