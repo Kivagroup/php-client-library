@@ -12,6 +12,7 @@ class ZCRMLayout
 	private $createdBy=null;
 	private $sections=null;
 	private $status=null;
+	private $convertMapping=array();
 	
 	
 	private function __construct($id)
@@ -113,5 +114,22 @@ class ZCRMLayout
 	{
 		return $this->sections;
 	}
+
+    /**
+     * convertMapping
+     * @return array
+     */
+    public function getConvertMapping(){
+        return $this->convertMapping;
+    }
+
+    /**
+     * convertMapping
+     * @param $module, $convertMap
+     */
+    public function addConvertMapping($module,$convertMap){
+        $this->convertMapping[$module] = $convertMap;
+    }
+
 }
 ?>

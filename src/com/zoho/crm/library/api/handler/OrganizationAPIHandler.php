@@ -5,7 +5,11 @@ require_once realpath(dirname(__FILE__).'/../../setup/users/ZCRMUserTheme.php');
 require_once realpath(dirname(__FILE__).'/../../setup/users/ZCRMRole.php');
 require_once realpath(dirname(__FILE__).'/../../setup/users/ZCRMProfile.php');
 require_once realpath(dirname(__FILE__).'/../../exception/ZCRMException.php');
+require_once realpath(dirname(__FILE__).'/../../crud/ZCRMPermission.php');
+require_once realpath(dirname(__FILE__).'/../../crud/ZCRMProfileSection.php');
+require_once realpath(dirname(__FILE__).'/../../crud/ZCRMProfileCategory.php');
 /**
+ * 
  * Purpose of this class is to fire User level APIs and construct the response
  * @author sumanth-3058
  *
@@ -127,7 +131,10 @@ class OrganizationAPIHandler extends APIHandler
 		$crmRoleInstance=ZCRMRole::getInstance($roleDetails['id']+0,$roleDetails['name']);
 		$crmRoleInstance->setLabel($roleDetails['label']);
 		$crmRoleInstance->setAdminRole((boolean)$roleDetails['admin_user']);
-		$crmRoleInstance->setReportingTo(ZCRMUser::getInstance($roleDetails['reporting_to']['id']+0,$roleDetails['reporting_to']['name']));
+		if(isset($roleDetails['reporting_to']))
+		{
+			$crmRoleInstance->setReportingTo(ZCRMUser::getInstance($roleDetails['reporting_to']['id']+0,$roleDetails['reporting_to']['name']));
+		}
 		return $crmRoleInstance;
 	}
 	
@@ -369,6 +376,42 @@ class OrganizationAPIHandler extends APIHandler
 		if($profileDetails['created_by']!=null)
 		{
 			$profileInstance->setCreatedBy(ZCRMUser::getInstance($profileDetails['created_by']['id']+0,$profileDetails['created_by']['name']));
+		}
+		if(isset($profileDetails['permissions_details']))
+		{
+			$permissions=$profileDetails['permissions_details'];
+			foreach ($permissions as $permission)
+			{
+				$perIns=ZCRMPermission::getInstance($permission['name'], $permission['id']+0);
+				$perIns->setDisplayLabel($permission['display_label']);
+				$perIns->setModule($permission['module']);
+				$perIns->setEnabled(boolval($permission['enabled']));
+				$profileInstance->addPermission($perIns);
+			}
+		}
+		if(isset($profileDetails['sections']))
+		{
+			$sections=$profileDetails['sections'];
+			foreach ($sections as $section)
+			{
+				$zcrmProfileSection=ZCRMProfileSection::getInstance($section['name']);
+				if(isset($section['categories']))
+				{
+					$categories=$section['categories'];
+					foreach ($categories as $category)
+					{
+						$categoryIns=ZCRMProfileCategory::getInstance($category['name']);
+						$categoryIns->setDisplayLabel($category['display_label']);
+						$categoryIns->setPermissionIds($category['permissions_details']);
+						if(isset($category['module']))
+						{
+							$categoryIns->setModule($category['module']);
+						}
+						$zcrmProfileSection->addCategory($categoryIns);
+					}
+				}
+				$profileInstance->addSection($zcrmProfileSection);
+			}
 		}
 		return $profileInstance;
 	}

@@ -18,8 +18,10 @@ class APIConstants
 	const API_MAX_RECORDS_MSG = "Cannot process more than 100 records at a time.";
 	const INVALID_DATA="INVALID_DATA";
 	
-	const CODE_ERROR = "error";
-	const CODE_SUCCESS = "success";
+	const CODE_SUCCESS = "SUCCESS";
+	
+	const STATUS_SUCCESS = "success";
+	const STATUS_ERROR = "error";
 	
 	const LEADS = "Leads";
 	const ACCOUNTS = "Accounts";

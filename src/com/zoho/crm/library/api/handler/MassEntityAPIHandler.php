@@ -51,7 +51,7 @@ class MassEntityAPIHandler extends APIHandler
 			for($i=0;$i<$size;$i++)
 			{
 				$entityResIns=$responses[$i];
-				if(APIConstants::CODE_SUCCESS===$entityResIns->getStatus())
+				if(APIConstants::STATUS_SUCCESS===$entityResIns->getStatus())
 				{
 					$responseData = $entityResIns->getResponseJSON();
 					$recordDetails = $responseData["details"];
@@ -104,7 +104,7 @@ class MassEntityAPIHandler extends APIHandler
 			for($i=0;$i<$size;$i++)
 			{
 				$entityResIns=$responses[$i];
-				if(APIConstants::CODE_SUCCESS===$entityResIns->getStatus())
+				if(APIConstants::STATUS_SUCCESS===$entityResIns->getStatus())
 				{
 					$responseData = $entityResIns->getResponseJSON();
 					$recordDetails = $responseData["details"];
@@ -316,7 +316,7 @@ class MassEntityAPIHandler extends APIHandler
 			for($i=0;$i<$size;$i++)
 			{
 				$entityResIns=$responses[$i];
-				if(APIConstants::CODE_SUCCESS===$entityResIns->getStatus())
+				if(APIConstants::STATUS_SUCCESS===$entityResIns->getStatus())
 				{
 					$responseData = $entityResIns->getResponseJSON();
 					$recordJSON = $responseData["details"];

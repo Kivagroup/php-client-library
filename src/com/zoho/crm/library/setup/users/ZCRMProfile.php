@@ -11,6 +11,8 @@ class ZCRMProfile
 	private $description=null;
 	private $createdBy=null;
 	private $category=null;
+	private $permissionList=array();
+	private $sectionsList=array();
 	
 	private function __construct($id,$profileName)
 	{
@@ -165,6 +167,39 @@ class ZCRMProfile
      */
     public function setCategory($category){
         $this->category = $category;
+    }
+
+
+    /**
+     * permissionList
+     * @return array of ZCRMPermission instances
+     */
+    public function getPermissionList(){
+        return $this->permissionList;
+    }
+
+    /**
+     * permissionList
+     * @param array $permissionList
+     */
+    public function addPermission($permissionIns){
+        array_push($this->permissionList,$permissionIns);
+    }
+    
+    /**
+     * sectionList
+     * @return array of ZCRMProfileSection instances
+     */
+    public function getSectionsList(){
+    	return $this->sectionsList;
+    }
+    
+    /**
+     * sectionList
+     * @param array $sectionList
+     */
+    public function addSection($sectionIns){
+    	array_push($this->sectionsList,$sectionIns);
     }
 
 }

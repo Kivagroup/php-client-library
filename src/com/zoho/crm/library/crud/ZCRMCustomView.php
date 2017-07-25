@@ -16,6 +16,7 @@ class ZCRMCustomView
 	private $criteriaPattern=null;
 	private $criteria=null;
 	private $categoriesList=array();
+	private $offLine=null;
 	
 	public function __construct($moduleAPIName,$id)
 	{
@@ -249,6 +250,17 @@ class ZCRMCustomView
      */
     public function setCategoriesList($categoriesList){
         $this->categoriesList = $categoriesList;
+    }
+    
+    
+    public function setOffLine($off_line)
+    {
+    	$this->offLine=(boolean)$off_line;
+    }
+    
+    public function isOffLine()
+    {
+    	return $this->offLine;
     }
 
 }

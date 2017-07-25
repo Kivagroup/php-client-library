@@ -417,6 +417,10 @@ class EntityAPIHandler extends APIHandler
 			{
 				$this->record->setModifiedTime("".$value);
 			}
+			else if("Last_Activity_Time"==$key)
+			{
+				$this->record->setLastActivityTime("".$value);
+			}
 			else if("Owner"==$key)
 			{
 				$owner =ZCRMUser::getInstance($value["id"], $value["name"]);

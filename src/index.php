@@ -35,6 +35,11 @@ require_once 'com/zoho/crm/library/crud/ZCRMSection.php';
 require_once 'com/zoho/crm/library/crud/ZCRMTax.php';
 require_once 'com/zoho/crm/library/crud/ZCRMJunctionRecord.php';
 require_once 'com/zoho/crm/library/crud/ZCRMTrashRecord.php';
+require_once 'com/zoho/crm/library/crud/ZCRMPermission.php';
+require_once 'com/zoho/crm/library/crud/ZCRMLeadConvertMapping.php';
+require_once 'com/zoho/crm/library/crud/ZCRMLeadConvertMappingField.php';
+require_once 'com/zoho/crm/library/crud/ZCRMProfileSection.php';
+require_once 'com/zoho/crm/library/crud/ZCRMProfileCategory.php';
 
 require_once 'com/zoho/crm/library/exception/ZCRMException.php';
 

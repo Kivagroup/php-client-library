@@ -84,6 +84,15 @@ class MetaDataAPIHandler extends APIHandler
 		$crmModuleInstance->setScoringSupported($moduleDetails['scoring_supported']);
 		$crmModuleInstance->setModuleName($moduleDetails['module_name']);
 		$crmModuleInstance->setBusinessCardFieldLimit(array_key_exists("business_card_field_limit",$moduleDetails)?$moduleDetails['business_card_field_limit']+0:0);
+		if(isset($moduleDetails['sequence_number']))
+		{
+			$crmModuleInstance->setSequenceNumber($moduleDetails['sequence_number']);
+		}
+		
+		if(isset($moduleDetails['global_search_supported']))
+		{
+			$crmModuleInstance->setGlobalSearchSupported($moduleDetails['global_search_supported']);
+		}
 		
 		$zcrmUserInstance=null;
 		if($moduleDetails['modified_by']!=null)
@@ -211,6 +220,11 @@ class MetaDataAPIHandler extends APIHandler
 			}
 			$customViewInstance->setCriteria($criteriaInstanceArray);
 			$customViewInstance->setCriteriaPattern($criteriaPattern);
+		}
+		
+		if(isset($customViewDetails['offline']))
+		{
+			$customViewInstance->setOffLine($customViewDetails['offline']);
 		}
 		
 		return $customViewInstance;

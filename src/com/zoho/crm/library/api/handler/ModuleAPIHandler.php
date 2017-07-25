@@ -13,6 +13,8 @@ require_once realpath(dirname(__FILE__).'/../../crud/ZCRMCustomViewCriteria.php'
 require_once realpath(dirname(__FILE__).'/../../crud/ZCRMCustomViewCategory.php');
 require_once realpath(dirname(__FILE__).'/../../crud/ZCRMRelatedListProperties.php');
 require_once realpath(dirname(__FILE__).'/../../crud/ZCRMModuleRelatedList.php');
+require_once realpath(dirname(__FILE__).'/../../crud/ZCRMLeadConvertMapping.php');
+require_once realpath(dirname(__FILE__).'/../../crud/ZCRMLeadConvertMappingField.php');
 require_once 'MetaDataAPIHandler.php';
 
 class ModuleAPIHandler extends APIHandler
@@ -353,7 +355,10 @@ class ModuleAPIHandler extends APIHandler
 			}
 			$customViewInstance->setCategoriesList($categoryInstanceArray);
 		}
-		
+		if(isset($customViewDetails['offline']))
+		{
+			$customViewInstance->setOffLine($customViewDetails['offline']);
+		}
 		return $customViewInstance;
 	}
 	public function getLayouts($allLayoutDetails)
@@ -520,6 +525,10 @@ class ModuleAPIHandler extends APIHandler
 		{
 			$fieldInstance->setDecimalPlace($fieldDetails['decimal_place']+0);
 		}
+		if(array_key_exists("json_type", $fieldDetails) && $fieldDetails['json_type']!=null)
+		{
+			$fieldInstance->setJsonType($fieldDetails['json_type']);
+		}
 		if(array_key_exists("formula", $fieldDetails) && sizeof($fieldDetails['formula'])>0)
 		{
 			$fieldInstance->setFormulaField(true);
@@ -614,6 +623,31 @@ class ModuleAPIHandler extends APIHandler
 		$layoutInstance->setSections(self::getAllSectionsOfLayout($layoutDetails['sections']));
 		
 		$layoutInstance->setStatus($layoutDetails['status']);
+		
+		if(isset($layoutDetails['convert_mapping']))
+		{
+			$convertModules=array('Contacts','Deals','Accounts');
+			foreach ($convertModules as $convertModule)
+			{
+				if(isset($layoutDetails['convert_mapping'][$convertModule]))
+				{
+					$contactsMap=$layoutDetails['convert_mapping'][$convertModule];
+					$convertMapIns=ZCRMLeadConvertMapping::getInstance($contactsMap['name'], $contactsMap['id']);
+					if(isset($contactsMap['fields']))
+					{
+						$fields=$contactsMap['fields'];
+						foreach ($fields as $field)
+						{
+							$convertMappingFieldIns=ZCRMLeadConvertMappingField::getInstance($field['api_name'], $field['id']+0);
+							$convertMappingFieldIns->setFieldLabel($field['field_label']);
+							$convertMappingFieldIns->setVisible($field['required']);
+							$convertMapIns->addFields($convertMappingFieldIns);
+						}
+					}
+					$layoutInstance->addConvertMapping($convertModule, $convertMapIns);
+				}
+			}
+		}
 		
 		return $layoutInstance;
 	}

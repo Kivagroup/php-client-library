@@ -35,6 +35,7 @@ class ZCRMField
 	private $prefix=null;
 	private $suffix=null;
 	private $startNumber=null;
+	private $jsonType=null;
 	
 	private function __construct($apiName)
 	{
@@ -125,7 +126,7 @@ class ZCRMField
 	}
 	public function setId($id)
 	{
-		$this->id=$id;
+		$this->id=$id+0;
 	}
 	public function getId()
 	{
@@ -300,6 +301,15 @@ class ZCRMField
 	public function getDecimalPlace()
 	{
 		return $this->decimalPlace;
+	}
+	
+	public function setJsonType($jsonType)
+	{
+		$this->jsonType=$jsonType;
+	}
+	public function getJsonType()
+	{
+		return $this->jsonType;
 	}
 }
 ?>

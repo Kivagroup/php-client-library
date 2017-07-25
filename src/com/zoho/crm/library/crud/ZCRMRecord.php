@@ -26,6 +26,7 @@ class ZCRMRecord
 	private $priceDetails = array();
 	private $layout=null;
 	private $taxList=array();
+	private $lastActivityTime=null;
 	
 	private function __construct($module,$entityId)
 	{
@@ -434,6 +435,23 @@ class ZCRMRecord
      */
     public function setLayout($layout){
         $this->layout = $layout;
+    }
+
+
+    /**
+     * lastActivityTime
+     * @return String
+     */
+    public function getLastActivityTime(){
+        return $this->lastActivityTime;
+    }
+
+    /**
+     * lastActivityTime
+     * @param String $lastActivityTime
+     */
+    public function setLastActivityTime($lastActivityTime){
+        $this->lastActivityTime = $lastActivityTime;
     }
 
 }

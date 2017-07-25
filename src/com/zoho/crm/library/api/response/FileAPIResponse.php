@@ -48,7 +48,7 @@ class FileAPIResponse
 		{
 			$this->response=$content;
 			$this->responseJSON=array();
-			$this->status=APIConstants::CODE_SUCCESS;
+			$this->status=APIConstants::STATUS_SUCCESS;
 		}
 		$this->responseHeaders=$headerMap;
 		return $this;

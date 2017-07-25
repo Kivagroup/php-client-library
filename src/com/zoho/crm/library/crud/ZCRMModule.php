@@ -37,6 +37,8 @@ class ZCRMModule
 	private $defaultTerritoryId=null;
 	private $defaultCustomViewId=null;
 	private $customView=null;
+	private $globalSearchSupported;
+	private $sequenceNumber;
 	
 	private function __construct($apiName)
 	{
@@ -378,6 +380,39 @@ class ZCRMModule
     {
     	return $this->customView;
     }
+    
+    /**
+     * globalSearchSupported
+     * @return boolean
+     */
+    public function isGlobalSearchSupported(){
+    	return $this->globalSearchSupported;
+    }
+    
+    /**
+     * globalSearchSupported
+     * @param boolean $globalSearchSupported
+     */
+    public function setGlobalSearchSupported($globalSearchSupported){
+    	$this->globalSearchSupported = $globalSearchSupported;
+    }
+    
+    /**
+     * sequenceNumber
+     * @return integer
+     */
+    public function getSequenceNumber(){
+    	return $this->sequenceNumber;
+    }
+    
+    /**
+     * sequenceNumber
+     * @param integer $sequenceNumber
+     */
+    public function setSequenceNumber($sequenceNumber){
+    	$this->sequenceNumber = $sequenceNumber;
+    }
+    
     
     /**
      * Returns the specified field of the module.
