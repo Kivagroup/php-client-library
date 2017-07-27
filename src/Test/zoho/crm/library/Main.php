@@ -7,6 +7,7 @@ require_once './api/RelatedListAPIHandlerTest.php';
 require_once './api/OrganizationAPIHandlerTest.php';
 require_once './api/MassEntityAPIHandlerTest.php';
 require_once './common/Helper.php';
+//require_once '/usr/local/php5/lib/php/Mail/mime.php'; // PEAR Mail_Mime packge
 
 class Main
 {
@@ -19,7 +20,7 @@ class Main
 		try{
 			ZCRMRestClient::initialize();
 			/*$oAuthCli = ZohoOAuth::getClientInstance();
-			$grantToken = "1000.70cbe4464e88ab5d1a5f928cb12b8996.81bb214c919482ec3467a344274236c5";
+			$grantToken = "1000.e8d1903e61ed8db6450e0199368af7bb.2d2333746dd2cf58be68154c67477ec5";
 			$oAuthTokens = $oAuthCli->generateAccessToken($grantToken);
 			$accessToken = $oAuthTokens->getAccessToken();
 			$refreshToken=$oAuthTokens->getRefreshToken();
@@ -30,10 +31,10 @@ class Main
 			$header="<html><head>Report</head><body><h1><center><b><i> PHP Client Library Test Report</i></b></center></h1><hr><br><table border=\"1\" width=\"100%\" cellspacing=\"2\" cellpadding=\"10\"><tr bgcolor=\"B7B2B2\"><td><b><center>SL no.</center></b></td><td><b><center>Class Name</center></b></td><td><b><center>Method Name</center></b></td><td><b><center>Message</center></b></td><td><b><center>Exception</center></b></td><td><b><center>Status</center></b></td><td><b><center>Time Taken(in milliseconds)</center></b></td></tr>";
 			fwrite($fp, $header);
 			OrganizationAPIHandlerTest::test($fp);
-			//MetaDataAPIHandlerTest::test($fp);
-			//ModuleAPIHandlerTest::test($fp);
-			//EntityAPIHandlerTest::test($fp);
-			//MassEntityAPIHandlerTest::test($fp);
+			MetaDataAPIHandlerTest::test($fp);
+			ModuleAPIHandlerTest::test($fp);
+			EntityAPIHandlerTest::test($fp);
+			MassEntityAPIHandlerTest::test($fp);
 			
 			$endTime=microtime(true)*1000;
 			$duration=$endTime-$startTime;
@@ -131,9 +132,9 @@ class Main
 		$body = $mime->get();
 		$headers = $mime->headers($headers);
 		
-		$host = "smtp.zohocorp.com";
+		$host = "mail.smtp.host";
 		$username = "sumanth-3058";
-		$password = "mac5@ZOHO";
+		$password = "";
 		
 		$smtp = Mail::factory('smtp', array ('host' => $host, 'auth' => true,
 				'username' => $username,'password' => $password));

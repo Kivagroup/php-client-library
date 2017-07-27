@@ -229,7 +229,7 @@ class OrganizationAPIHandlerTest
 			}
 			foreach ($zcrmUsers as $zcrmUser)
 			{
-				if($zcrmUser->getEmail()==null || $zcrmUser->getId()==null || $zcrmUser->getLastName()==null || $zcrmUser->getRole()==null || $zcrmUser->getProfile()==null ||  $zcrmUser->getLanguage()==null|| $zcrmUser->getLocale()==null || $zcrmUser->getDateFormat()==null|| $zcrmUser->getZuid()==null|| $zcrmUser->getTimeFormat()==null|| $zcrmUser->getStatus()==null)
+				if($zcrmUser->getEmail()==null || $zcrmUser->getId()==null || $zcrmUser->getLastName()==null || $zcrmUser->getRole()==null || $zcrmUser->getProfile()==null ||  $zcrmUser->getLanguage()==null|| $zcrmUser->getLocale()==null || $zcrmUser->getDateFormat()==null|| $zcrmUser->getTimeFormat()==null|| $zcrmUser->getStatus()==null)
 				{
 					throw new ZCRMException("Invalid User Data Received");
 				}
@@ -273,7 +273,7 @@ class OrganizationAPIHandlerTest
 				$responseInstance=$orgIns->getUser($userId);
 				$endTime=microtime(true)*1000;
 				$zcrmUser=$responseInstance->getData();
-				if($zcrmUser->getEmail()==null || $zcrmUser->getId()==null || $zcrmUser->getLastName()==null || $zcrmUser->getRole()==null || $zcrmUser->getProfile()==null ||  $zcrmUser->getLanguage()==null|| $zcrmUser->getLocale()==null || $zcrmUser->getDateFormat()==null|| $zcrmUser->getZuid()==null|| $zcrmUser->getTimeFormat()==null|| $zcrmUser->getStatus()==null)
+				if($zcrmUser->getEmail()==null || $zcrmUser->getId()==null || $zcrmUser->getLastName()==null || $zcrmUser->getRole()==null || $zcrmUser->getProfile()==null ||  $zcrmUser->getLanguage()==null|| $zcrmUser->getLocale()==null || $zcrmUser->getDateFormat()==null|| $zcrmUser->getTimeFormat()==null|| $zcrmUser->getStatus()==null)
 				{
 					throw new ZCRMException("Invalid User Data Received (like ID, Email, LastName, Profile, Role,..) is NULL)");
 				}
@@ -367,7 +367,7 @@ class OrganizationAPIHandlerTest
 				}
 				foreach ($zcrmUsers as $zcrmUser)
 				{
-					if($zcrmUser->getEmail()==null || $zcrmUser->getId()==null || $zcrmUser->getLastName()==null || $zcrmUser->getRole()==null || $zcrmUser->getProfile()==null ||  $zcrmUser->getLanguage()==null|| $zcrmUser->getLocale()==null || $zcrmUser->getDateFormat()==null|| $zcrmUser->getZuid()==null|| $zcrmUser->getTimeFormat()==null|| $zcrmUser->getStatus()==null)
+					if($zcrmUser->getEmail()==null || $zcrmUser->getId()==null || $zcrmUser->getLastName()==null || $zcrmUser->getRole()==null || $zcrmUser->getProfile()==null ||  $zcrmUser->getLanguage()==null|| $zcrmUser->getLocale()==null || $zcrmUser->getDateFormat()==null|| $zcrmUser->getTimeFormat()==null|| $zcrmUser->getStatus()==null)
 					{
 						throw new ZCRMException("Invalid User Data Received");
 					}
