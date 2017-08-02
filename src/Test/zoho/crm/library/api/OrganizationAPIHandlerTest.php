@@ -103,7 +103,6 @@ class OrganizationAPIHandlerTest
 			{
 				if($zcrmRole->getId()==null || $zcrmRole->getName()==null || $zcrmRole->getLabel()==null || ($zcrmRole->getReportingTo()!=null && ($zcrmRole->getReportingTo()->getId()==null || $zcrmRole->getReportingTo()->getName()==null)))
 				{
-					var_dump($zcrmRole);
 					throw new ZCRMException("Invalid Role Data Received (Either ID or Name or Label or reportingTo is NULL)");
 				}
 				if($zcrmRole->isAdminRole())

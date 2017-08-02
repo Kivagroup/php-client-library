@@ -1,12 +1,12 @@
 {
-    "name": "sumanthchilka/php-client-library",
+    "name": "zohocrm/php-client-library",
     "description": "Client Library SDK for PHP",
     "type": "library",
-    "homepage": "https://github.com/sumanthchilka/php-client-library",
+    "homepage": "https://github.com/zoho/php-client-library",
     "authors": [
         {
             "name": "Sumanth Reddy Chilka",
-            "homepage": "https://www.zoho.com/",
+            "homepage": "https://www.zoho.com/crm/",
             "role": "Developer"
         }
     ],

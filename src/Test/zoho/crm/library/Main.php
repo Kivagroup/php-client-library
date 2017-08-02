@@ -45,7 +45,7 @@ class Main
 			fwrite($fp, Helper::TROPEN.'<td colspan="2"><font color="green"><h2>Success Count</h1></font>'.Helper::TDCLOSE.'<td colspan="6"><h2><font color="green">'.self::$successCount.Helper::TDTRCLOSE);
 			fwrite($fp, Helper::TROPEN.'<td colspan="2"><font color="grey"><h2>Run Duration (in min)</h1></font>'.Helper::TDCLOSE.'<td colspan="6"><h2>'.($duration/60).Helper::TDTRCLOSE);
 			fclose($fp);
-			self::sendMail($fileName);
+			//self::sendMail($fileName);
 		}
 		catch (Exception $e)
 		{
@@ -76,7 +76,7 @@ class Main
 		$eol = "\r\n";
 		
 		// main header (multipart mandatory)
-		$headers = "From: PHP Automation <sumanth.chilka@zohocorp.com>" . $eol;
+		$headers = "From: PHP Automation <EMAIL HERE>" . $eol;
 		$headers .= "MIME-Version: 1.0" . $eol;
 		$headers .= "Content-Type: multipart/mixed; boundary=\"" . $separator . "\"" . $eol;
 		$headers .= "Content-Transfer-Encoding: 7bit" . $eol;
@@ -96,7 +96,7 @@ class Main
 		$body .= $fileContent . $eol;
 		$body .= "--" . $separator . "--";
 		
-		$mailTo="sumanth.chilka@zohocorp.com";
+		$mailTo="EMAIL HERE";
 		$subject="PHP Client Library Automation Report";
 		//SEND Mail
 		if (mail($mailTo, $subject, $body, $headers)) {
@@ -110,8 +110,8 @@ class Main
 	
 	public function sendMailWithAuthentication($file)
 	{
-		$from = "PHP Automation <sumanth.chilka@zohocorp.com>";
-		$to = "Sumanth <sumanth.chilka@zohocorp.com>";
+		$from = "PHP Automation <EMAIL HERE>";
+		$to = "Sumanth <EMAIL HERE>";
 		$subject = "Automation Report!";
 		
 		$headers = array ('From' => $from,'To' => $to, 'Subject' => $subject);
@@ -133,8 +133,8 @@ class Main
 		$headers = $mime->headers($headers);
 		
 		$host = "mail.smtp.host";
-		$username = "sumanth-3058";
-		$password = "";
+		$username = "USERNAME HERE";
+		$password = "PASSWORD HERE";
 		
 		$smtp = Mail::factory('smtp', array ('host' => $host, 'auth' => true,
 				'username' => $username,'password' => $password));

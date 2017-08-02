@@ -361,7 +361,6 @@ class ModuleAPIHandlerTest
 				{
 					if($zcrmCustomView->getId()==null || $zcrmCustomView->getName()==null || !is_bool($zcrmCustomView->isDefault()) || ($zcrmCustomView->getSortBy()!=null && $zcrmCustomView->getSortOrder()==null) || !is_bool($zcrmCustomView->isOffLine()))
 					{
-						var_dump($zcrmCustomView);
 						throw new ZCRMException("Invalid Custom View Data Received");
 					}
 					else if(!TestUtil::isActivityModule($moduleName) && ($zcrmCustomView->getFields()==null || !(sizeof($zcrmCustomView->getFields())>=1)))

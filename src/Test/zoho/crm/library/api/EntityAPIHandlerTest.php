@@ -596,6 +596,7 @@ class EntityAPIHandlerTest
 			$responseRecord=$responseIns->getData();
 			if($responseRecord->getEntityId()==null || $responseIns->getHttpStatusCode()!=APIConstants::RESPONSECODE_CREATED || $responseIns->getCode()!=APIConstants::CODE_SUCCESS || $responseIns->getStatus()!=APIConstants::STATUS_SUCCESS || $responseIns->getDetails()['id']==null)
 			{
+				var_dump($responseRecord);
 				Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'validateCreateResponse',"Record Creation Failed",$responseIns->getMessage(),'failure',($endTime-$startTime));
 				return false;
 			}
@@ -628,7 +629,6 @@ class EntityAPIHandlerTest
 			{
 				if($value!=$fieldKeyValueMapGET[$key])
 				{
-					var_dump($fieldKeyValueMapGET);
 					Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.$moduleAPIName.")",'validateCreateResponse',"Invalid Response","Given Field value is not populated(field:".$key.")",'failure',($endTime-$startTime));
 					return false;
 				}
@@ -686,7 +686,6 @@ class EntityAPIHandlerTest
 			
 		}catch (ZCRMException $e)
 		{
-			var_dump($e);
 			$endTime=$endTime==0?microtime(true)*1000:$endTime;
 			Helper::writeToFile(self::$filePointer,Main::getCurrentCount(),'EntityAPIHandlerTest('.self::$firstParnetModule.','.self::$firstParnetId.")",'uploadFile(ATTACHMENT_URL)',$e->getMessage(),$e->getTraceAsString(),'failure',($endTime-$startTime));
 			return false;

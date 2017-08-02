@@ -82,59 +82,6 @@ class ZohoHTTPConnector
 		curl_close($curl_pointer);
 		return array($result,$responseInfo);
 	}
-	/*
-	public function downloadFile1()
-	{
-		$curl_pointer=curl_init();
-		$fp=fopen (dirname(__FILE__) . '/localfile.tmp', 'w');
-		var_dump(dirname(__FILE__));
-		curl_setopt($curl_pointer,CURLOPT_URL,self::getUrl());
-		curl_setopt($curl_pointer,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl_pointer,CURLOPT_HEADER,true);
-		curl_setopt($curl_pointer,CURLOPT_TIMEOUT,20);
-		//curl_setopt($curl_pointer,CURLOPT_HTTP_VERSION,'CURL_HTTP_VERSION_1_1');
-		curl_setopt($curl_pointer, CURLOPT_FOLLOWLOCATION, true);
-		//$this->addHeader('Accept', 'application/json');
-		curl_setopt($curl_pointer,CURLOPT_FILE,$fp);
-		curl_setopt($curl_pointer,CURLOPT_HTTPHEADER,self::getRequestHeadersAsArray());
-		curl_setopt($curl_pointer,CURLOPT_CUSTOMREQUEST,APIConstants::REQUEST_METHOD_GET);
-		$result=curl_exec($curl_pointer);
-		$responseInfo=curl_getinfo($curl_pointer);
-		$header = substr($result, 0, $responseInfo['header_size']);
-		var_dump($header);
-		//var_dump($responseInfo);
-		
-		curl_close($curl_pointer);
-		fclose($fp);
-	}
-	
-	public function post()
-	{
-		$curl_pointer=curl_init();
-		curl_setopt($curl_pointer,CURLOPT_URL,self::getUrl());
-		curl_setopt($curl_pointer,CURLOPT_POSTFIELDS,self::getUrlParamsAsString($this->requestParams));
-		curl_setopt($curl_pointer,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl_pointer,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
-		curl_setopt($curl_pointer,CURLOPT_HTTPHEADER,$this->requestHeaders);
-		curl_setopt($curl_pointer,CURLOPT_POST,$this->requestParamCount);
-		$result=curl_exec($curl_pointer);
-		curl_close($curl_pointer);
-		
-		return $result;
-	}
-	
-	public function get()
-	{
-		$curl_pointer=curl_init();
-		$url=self::getUrl()."?".http_build_query($this->requestParams);
-		curl_setopt($curl_pointer,CURLOPT_URL,$url);
-		curl_setopt($curl_pointer,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl_pointer,CURLOPT_HTTPHEADER,$this->requestHeaders);
-		curl_setopt($curl_pointer,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
-		$result=curl_exec($curl_pointer);
-		curl_close($curl_pointer);
-	}
-	*/
 	
 	public function getUrl() {
 		return $this->url;
