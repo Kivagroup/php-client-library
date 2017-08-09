@@ -53,7 +53,7 @@ class ZCRMProfileCategory
 
     /**
      * displayLabel
-     * @return array
+     * @return string
      */
     public function getDisplayLabel(){
         return $this->displayLabel;

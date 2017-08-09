@@ -72,7 +72,7 @@ class ZCRMRole
      * get the Role label
      * @return String
      */
-    public function getLabel(){
+    public function getDisplayLabel(){
         return $this->label;
     }
 
@@ -80,7 +80,7 @@ class ZCRMRole
      * Set the Role label
      * @param String $label
      */
-    public function setLabel($label){
+    public function setDisplayLabel($label){
         $this->label = $label;
     }
 

@@ -72,7 +72,7 @@ class ZCRMField
 	{
 		$this->visible=$isVisible;
 	}
-	public function IsVisible()
+	public function isVisible()
 	{
 		return $this->visible;
 	}

@@ -118,7 +118,7 @@ class MetaDataAPIHandler extends APIHandler
 		if(array_key_exists("display_field",$moduleDetails))
 		{
 			$crmModuleInstance->setDisplayFieldName(isset($moduleDetails['display_field']['name'])?$moduleDetails['display_field']['name']:null);
-			$crmModuleInstance->setDisplayFieldId(isset($moduleDetails['display_field']['id'])?$moduleDetails['display_field']['id']:null);
+			$crmModuleInstance->setDisplayFieldId(isset($moduleDetails['display_field']['id'])?$moduleDetails['display_field']['id']+0:null);
 		}
 		$relatedListInstanceArray=null;
 		if(array_key_exists("related_lists",$moduleDetails))

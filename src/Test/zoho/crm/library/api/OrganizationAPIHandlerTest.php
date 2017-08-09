@@ -101,7 +101,7 @@ class OrganizationAPIHandlerTest
 			}
 			foreach ($zcrmRoles as $zcrmRole)
 			{
-				if($zcrmRole->getId()==null || $zcrmRole->getName()==null || $zcrmRole->getLabel()==null || ($zcrmRole->getReportingTo()!=null && ($zcrmRole->getReportingTo()->getId()==null || $zcrmRole->getReportingTo()->getName()==null)))
+				if($zcrmRole->getId()==null || $zcrmRole->getName()==null || $zcrmRole->getDisplayLabel()==null || ($zcrmRole->getReportingTo()!=null && ($zcrmRole->getReportingTo()->getId()==null || $zcrmRole->getReportingTo()->getName()==null)))
 				{
 					throw new ZCRMException("Invalid Role Data Received (Either ID or Name or Label or reportingTo is NULL)");
 				}
@@ -136,7 +136,7 @@ class OrganizationAPIHandlerTest
 				$responseInstance=$orgIns->getRole($roleId);
 				$endTime=microtime(true)*1000;
 				$zcrmRole=$responseInstance->getData();
-				if($zcrmRole->getId()==null || $zcrmRole->getName()==null || $zcrmRole->getLabel()==null || ($zcrmRole->getReportingTo()!=null && ($zcrmRole->getReportingTo()->getId()==null || $zcrmRole->getReportingTo()->getName()==null)))
+				if($zcrmRole->getId()==null || $zcrmRole->getName()==null || $zcrmRole->getDisplayLabel()==null || ($zcrmRole->getReportingTo()!=null && ($zcrmRole->getReportingTo()->getId()==null || $zcrmRole->getReportingTo()->getName()==null)))
 				{
 					throw new ZCRMException("Invalid Role Data Received (Either ID or Name or Label or Reporting To is NULL)");
 				}

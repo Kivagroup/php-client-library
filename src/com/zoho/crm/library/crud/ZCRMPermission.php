@@ -77,7 +77,6 @@ class ZCRMPermission
     /**
      * name
      * @param String $name
-     * @return ZCRMPermission
      */
     public function setName($name){
         $this->name = $name;
@@ -94,7 +93,6 @@ class ZCRMPermission
     /**
      * enabled
      * @param Boolean $enabled
-     * @return ZCRMPermission
      */
     public function setEnabled($enabled){
         $this->enabled = $enabled;

@@ -285,7 +285,6 @@ class ZCRMOrganization
 	 */
 	public function setCurrencyLocale($currency_locale){
 		$this->currency_locale = $currency_locale;
-		return $this;
 	}
 	
 	/**
